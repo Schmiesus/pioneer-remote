@@ -1,788 +1,216 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<link rel="manifest" href="/manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Pioneer">
-<meta name="theme-color" content="#ff2d6b">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Pioneer Remote</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg:        #0a000f;
-    --panel:     #0f0018;
-    --panel2:    #160020;
-    --border:    #3a1245;
-    --accent:    #ff2d6b;
-    --accent-dim:#7a0f35;
-    --accent-glow:rgba(255,45,107,0.15);
-    --green:     #bf5fff;
-    --red:       #ff2d6b;
-    --blue:      #c03aff;
-    --text:      #d8b0e8;
-    --text-dim:  #5a3a6a;
-    --seg:       #08000e;
-    --font-display: 'VT323', monospace;
-  }
+const express = require('express');
+const { WebSocketServer } = require('ws');
+const net = require('net');
+const dgram = require('dgram');
+const http = require('http');
+const path = require('path');
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.json());
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
-    pointer-events: none;
-    z-index: 1000;
-  }
-
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(191,95,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(191,95,255,0.03) 1px, transparent 1px);
-    background-size: 32px 32px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .app {
-    position: relative; z-index: 1;
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  /* VFD */
-  .vfd-header {
-    background: var(--seg);
-    border: 1px solid var(--accent-dim);
-    border-radius: 8px;
-    padding: 14px 18px;
-    position: relative;
-    overflow: hidden;
-  }
-  .vfd-header::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .vfd-brand {
-    font-family: var(--font-display);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 8px;
-    color: var(--accent-dim);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .vfd-display {
-    font-family: var(--font-display);
-    font-size: 28px;
-    color: var(--accent);
-    text-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent-glow);
-    letter-spacing: 2px;
-    min-height: 36px;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  .vfd-sub { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
-  .vfd-indicator { font-family: var(--font-display); font-size: 10px; letter-spacing: 2px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
-  .vfd-indicator.active { color: var(--accent); }
-  .vfd-indicator.muted  { color: var(--red); }
-  .vfd-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 4px currentColor; }
-
-  /* Connection bar */
-  .conn-bar {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .conn-status { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; transition: background 0.3s; }
-  .conn-status.connected  { background: var(--green); box-shadow: 0 0 8px var(--green); }
-  .conn-status.connecting { background: var(--accent); animation: pulse 1s infinite; }
-  .conn-status.error      { background: var(--red); }
-  .conn-host { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--text-dim); flex: 1; }
-  .conn-btn {
-    font-family: var(--font-display);
-    font-size: 14px;
-    letter-spacing: 2px;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .conn-btn:hover  { border-color: var(--accent); color: var(--accent); }
-  .conn-btn.active { border-color: var(--red); color: var(--red); }
-
-  /* Card */
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-  }
-  .card-label {
-    font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 4px;
-    color: var(--text-dim);
-    margin-bottom: 14px;
-  }
-
-  /* Power */
-  .power-strip { display: flex; gap: 10px; align-items: center; }
-  .power-btn {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: var(--panel2);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-  .power-btn svg { width: 22px; height: 22px; }
-  .power-btn.on { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 16px var(--accent-glow); }
-  .power-info { flex: 1; }
-  .power-label { font-family: var(--font-display); font-size: 18px; color: var(--text-dim); letter-spacing: 2px; }
-  .power-label.on { color: var(--accent); }
-  .power-model { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 3px; }
-
-  /* Volume */
-  .vol-display { text-align: center; margin: 4px 0 12px; }
-  .vol-db { font-family: var(--font-display); font-size: 48px; color: var(--accent); text-shadow: 0 0 16px var(--accent); letter-spacing: 1px; }
-  .vol-db.muted { color: var(--red); }
-  .vol-unit { font-family: var(--font-display); font-size: 14px; color: var(--text-dim); letter-spacing: 3px; margin-top: 2px; }
-  .vol-controls { display: flex; align-items: center; gap: 12px; }
-  .vol-slider {
-    flex: 1; -webkit-appearance: none;
-    height: 4px; border-radius: 2px;
-    background: linear-gradient(to right, var(--accent) var(--pct, 0%), var(--border) var(--pct, 0%));
-    outline: none; cursor: pointer;
-  }
-  .vol-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 18px; height: 18px;
-    border-radius: 50%; background: var(--accent);
-    box-shadow: 0 0 8px var(--accent); cursor: pointer;
-  }
-  .btn-round {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 1px solid var(--border); background: var(--panel2);
-    color: var(--text); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; transition: all 0.1s; flex-shrink: 0; user-select: none;
-  }
-  .btn-round:active { transform: scale(0.9); }
-  .btn-round:hover  { border-color: var(--accent); color: var(--accent); }
-  .mute-btn {
-    padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px;
-    background: transparent; font-family: var(--font-display); font-size: 14px;
-    letter-spacing: 2px; color: var(--text-dim); cursor: pointer; transition: all 0.15s;
-    margin-top: 12px; width: 100%;
-  }
-  .mute-btn.muted { border-color: var(--red); color: var(--red); background: rgba(255,45,107,0.08); }
-
-  /* Input grid */
-  .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .input-chip {
-    padding: 8px 6px; border: 1px solid var(--border); border-radius: 6px;
-    background: var(--panel2); font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 600; color: var(--text-dim);
-    cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.2;
-  }
-  .input-chip:hover  { border-color: var(--accent-dim); color: var(--text); }
-  .input-chip.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
-
-  /* Tabs */
-  .tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
-  .tab {
-    flex: 1; padding: 8px 4px; border-radius: 7px; border: none; background: transparent;
-    font-family: var(--font-display); font-size: 13px; letter-spacing: 1.5px;
-    color: var(--text-dim); cursor: pointer; transition: all 0.15s; text-align: center;
-  }
-  .tab.active { background: var(--panel2); color: var(--accent); border: 1px solid var(--border); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: flex; flex-direction: column; gap: 12px; }
-
-  /* D-pad */
-  .dpad { display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(3, 52px); gap: 6px; margin: 0 auto; width: fit-content; }
-  .dpad-btn {
-    width: 52px; height: 52px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--panel2); color: var(--text); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; transition: all 0.1s; user-select: none;
-  }
-  .dpad-btn:active { transform: scale(0.9); }
-  .dpad-btn:hover  { border-color: var(--accent); }
-  .dpad-btn.center { border-color: var(--accent-dim); background: var(--accent-glow); font-family: var(--font-display); font-size: 18px; color: var(--accent); font-weight: 700; }
-  .dpad-btn.empty  { visibility: hidden; }
-  .nav-extras { display: flex; gap: 8px; margin-top: 8px; }
-  .nav-btn {
-    flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 7px;
-    background: var(--panel2); font-family: var(--font-display); font-size: 13px;
-    letter-spacing: 2px; color: var(--text-dim); cursor: pointer; text-align: center; transition: all 0.15s;
-  }
-  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* Tone */
-  .tone-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-  .tone-label { font-family: var(--font-display); font-size: 13px; letter-spacing: 2px; color: var(--text-dim); width: 60px; flex-shrink: 0; }
-  .tone-val   { font-family: 'Share Tech Mono', monospace; font-size: 13px; width: 48px; text-align: right; color: var(--accent); flex-shrink: 0; }
-  .tone-slider { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--border); outline: none; cursor: pointer; }
-  .tone-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-  .eq-canvas { width: 100%; height: 70px; }
-
-  /* Zone 2 */
-  .zone2-power { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
-  .toggle-btn {
-    padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--panel2); font-family: var(--font-display); font-size: 14px;
-    letter-spacing: 2px; color: var(--text-dim); cursor: pointer; transition: all 0.15s;
-  }
-  .toggle-btn.on { border-color: var(--green); color: var(--green); background: rgba(191,95,255,0.08); }
-
-  /* Modes */
-  .mode-list { display: flex; flex-direction: column; gap: 4px; }
-  .mode-item { display: flex; align-items: center; padding: 10px 14px; border-radius: 7px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s; gap: 12px; }
-  .mode-item:hover { background: var(--panel2); }
-  .mode-item.active { background: var(--accent-glow); border-color: var(--accent-dim); }
-  .mode-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; transition: all 0.15s; }
-  .mode-item.active .mode-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-  .mode-name { font-size: 14px; font-weight: 500; flex: 1; }
-  .mode-item.active .mode-name { color: var(--accent); }
-  .mode-code { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); }
-
-  /* Theme picker */
-  .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .theme-swatch {
-    border-radius: 10px; border: 2px solid transparent;
-    padding: 14px 12px; cursor: pointer; transition: all 0.2s;
-  }
-  .theme-swatch.active { border-color: white !important; box-shadow: 0 0 16px rgba(255,255,255,0.15); }
-  .theme-swatch:active { transform: scale(0.96); }
-  .theme-swatch-name { font-family: 'VT323', monospace; font-size: 20px; letter-spacing: 2px; margin-bottom: 4px; }
-  .theme-swatch-desc { font-size: 11px; opacity: 0.6; line-height: 1.3; }
-  .theme-dots { display: flex; gap: 5px; margin-top: 8px; }
-  .theme-dot  { width: 10px; height: 10px; border-radius: 50%; }
-
-  /* Info banner */
-  .info-banner {
-    padding: 14px; background: rgba(0,0,30,0.5);
-    border-radius: 10px; border: 1px solid rgba(192,58,255,0.3);
-  }
-
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-</style>
-</head>
-<body>
-<div class="app">
-
-  <!-- VFD Display -->
-  <div class="vfd-header">
-    <div class="vfd-brand">Pioneer</div>
-    <div class="vfd-display" id="vfdDisplay">-- -- --</div>
-    <div class="vfd-sub">
-      <div class="vfd-indicator" id="indPower"><div class="vfd-dot"></div><span>STANDBY</span></div>
-      <div class="vfd-indicator" id="indInput"><div class="vfd-dot"></div><span id="indInputName">--</span></div>
-      <div class="vfd-indicator" id="indMute"><div class="vfd-dot"></div>MUTE</div>
-    </div>
-  </div>
-
-  <!-- Connection bar -->
-  <div class="conn-bar">
-    <div class="conn-status" id="connStatus"></div>
-    <span class="conn-host" id="connHost">--</span>
-    <button class="conn-btn" id="connBtn" onclick="toggleConnection()">CONNECT</button>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('main',this)">MAIN</button>
-    <button class="tab" onclick="switchTab('zone2',this)">ZONE2</button>
-    <button class="tab" onclick="switchTab('tone',this)">TONE</button>
-    <button class="tab" onclick="switchTab('mode',this)">MODE</button>
-    <button class="tab" onclick="switchTab('nav',this)">NAV</button>
-    <button class="tab" onclick="switchTab('settings',this)">⚙</button>
-  </div>
-
-  <!-- MAIN TAB -->
-  <div class="tab-panel active" id="tab-main">
-    <div class="card">
-      <div class="power-strip">
-        <button class="power-btn" id="powerBtn" onclick="cmd('PZ')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round">
-            <path d="M12 2v6M19.07 4.93A10 10 0 1 1 4.93 4.93"/>
-          </svg>
-        </button>
-        <div class="power-info">
-          <div class="power-label" id="powerLabel">STANDBY</div>
-          <div class="power-model">Pioneer VSX Series</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">VOLUME</div>
-      <div class="vol-display">
-        <div class="vol-db" id="volDb">---</div>
-        <div class="vol-unit" id="volUnit">dB</div>
-      </div>
-      <div class="vol-controls">
-        <button class="btn-round" onclick="cmd('VD')">−</button>
-        <input class="vol-slider" id="volSlider" type="range" min="0" max="185" value="0"
-          oninput="onVolSlider(this.value)" onchange="sendVol(this.value)" style="--pct:0%">
-        <button class="btn-round" onclick="cmd('VU')">+</button>
-      </div>
-      <button class="mute-btn" id="muteBtn" onclick="cmd('MZ')">MUTE</button>
-    </div>
-
-    <div class="card">
-      <div class="card-label">INPUT SELECT</div>
-      <div class="input-grid" id="inputGrid"></div>
-    </div>
-  </div>
-
-  <!-- ZONE 2 TAB -->
-  <div class="tab-panel" id="tab-zone2">
-    <div class="card">
-      <div class="card-label">ZONE 2</div>
-      <div class="zone2-power">
-        <span style="font-size:14px;font-weight:600;letter-spacing:1px">Power</span>
-        <button class="toggle-btn" id="z2PowerBtn" onclick="toggleZ2Power()">OFF</button>
-      </div>
-      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
-        <div class="card-label">ZONE 2 VOLUME</div>
-        <div class="vol-display">
-          <div class="vol-db" id="z2VolDb" style="font-size:36px">---</div>
-        </div>
-        <div class="vol-controls">
-          <button class="btn-round" onclick="cmd('ZD')">−</button>
-          <input class="vol-slider" id="z2Slider" type="range" min="0" max="81" value="0"
-            style="--pct:0%" onchange="sendZ2Vol(this.value)" oninput="onZ2Slider(this.value)">
-          <button class="btn-round" onclick="cmd('ZU')">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-label">ZONE 2 INPUT</div>
-      <div class="input-grid" id="z2InputGrid"></div>
-    </div>
-  </div>
-
-  <!-- TONE TAB -->
-  <div class="tab-panel" id="tab-tone">
-    <div class="info-banner">
-      <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue)">
-        ⚠ Requires Tone Control enabled:<br>System Setup → Audio → Tone Control
-      </span>
-    </div>
-    <div class="card">
-      <div class="card-label">BASS / TREBLE</div>
-      <div class="tone-row">
-        <div class="tone-label">BASS</div>
-        <input class="tone-slider" id="bassSlider" type="range" min="-6" max="6" value="0" oninput="onToneSlider('bass',this.value)">
-        <div class="tone-val" id="bassVal">0 dB</div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:16px">
-        <button class="nav-btn" onclick="cmd('BD')">BASS −</button>
-        <button class="nav-btn" onclick="cmd('BI')">BASS +</button>
-      </div>
-      <div class="tone-row">
-        <div class="tone-label">TREBLE</div>
-        <input class="tone-slider" id="trebleSlider" type="range" min="-6" max="6" value="0" oninput="onToneSlider('treble',this.value)">
-        <div class="tone-val" id="trebleVal">0 dB</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="nav-btn" onclick="cmd('TD')">TREBLE −</button>
-        <button class="nav-btn" onclick="cmd('TI')">TREBLE +</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-label">EQ CURVE</div>
-      <canvas class="eq-canvas" id="eqCanvas"></canvas>
-    </div>
-  </div>
-
-  <!-- MODE TAB -->
-  <div class="tab-panel" id="tab-mode">
-    <div class="card">
-      <div class="card-label">LISTENING MODE</div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="nav-btn" onclick="cmd('MD')">◀ PREV</button>
-        <button class="nav-btn" onclick="cmd('MC')">NEXT ▶</button>
-      </div>
-      <div class="mode-list" id="modeList"></div>
-    </div>
-  </div>
-
-  <!-- NAV TAB -->
-  <div class="tab-panel" id="tab-nav">
-    <div class="card">
-      <div class="card-label">NAVIGATION</div>
-      <div class="dpad">
-        <div class="dpad-btn empty"></div>
-        <button class="dpad-btn" onclick="cmd('CUP')">▲</button>
-        <div class="dpad-btn empty"></div>
-        <button class="dpad-btn" onclick="cmd('CLE')">◀</button>
-        <button class="dpad-btn center" onclick="cmd('CEN')">OK</button>
-        <button class="dpad-btn" onclick="cmd('CRI')">▶</button>
-        <div class="dpad-btn empty"></div>
-        <button class="dpad-btn" onclick="cmd('CDN')">▼</button>
-        <div class="dpad-btn empty"></div>
-      </div>
-      <div class="nav-extras">
-        <button class="nav-btn" onclick="cmd('CRT')">RETURN</button>
-        <button class="nav-btn" onclick="cmd('CHM')">HOME</button>
-        <button class="nav-btn" onclick="cmd('CQS')">STATUS</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTINGS TAB -->
-  <div class="tab-panel" id="tab-settings">
-    <div class="card">
-      <div class="card-label">THEME</div>
-      <div class="theme-grid" id="themeGrid"></div>
-    </div>
-  </div>
-
-</div>
-<script>
-// ── Data ─────────────────────────────────────────────────────────────────────
-const INPUTS = {
-  '00':'PHONO','01':'CD','02':'TUNER','03':'CD-R','04':'DVD','05':'TV/SAT',
-  '10':'VIDEO 1','14':'VIDEO 2','15':'DVR/BDR','19':'HDMI 1','20':'HDMI 2',
-  '21':'HDMI 3','22':'HDMI 4','23':'HDMI 5','25':'BD','26':'NET',
-  '38':'INET RADIO','41':'PANDORA','44':'MEDIA SRV',
-};
-const MODES = {
-  '0001':'STEREO','0009':'PURE DIRECT','0100':'DIRECT','0101':'AUTO SURROUND',
-  '0010':'STANDARD','0151':'DOLBY DIGITAL','0200':'DTS / DTS-HD',
-  '0003':'FRONT STAGE SRR','0111':'PL IIx MOVIE','0112':'PL IIx MUSIC',
-  '0113':'PL IIx GAME','0107':'NEO:6 CINEMA','0108':'NEO:6 MUSIC',
+let receiverConfig = {
+  host: process.env.RECEIVER_HOST || '',
+  port: parseInt(process.env.RECEIVER_PORT || '23'),
 };
 
-// ── Themes ────────────────────────────────────────────────────────────────────
-const THEMES = {
-  punk: {
-    name:'PUNK', desc:'Retro red/purple punk',
-    bg:'#0a000f', panel:'#0f0018', panel2:'#160020', border:'#3a1245',
-    accent:'#ff2d6b', accentDim:'#7a0f35', accentGlow:'rgba(255,45,107,0.15)',
-    green:'#bf5fff', red:'#ff2d6b', blue:'#c03aff',
-    text:'#d8b0e8', textDim:'#5a3a6a', seg:'#08000e',
-    themeColor:'#ff2d6b',
-  },
-  amber: {
-    name:'CLASSIC', desc:'Original amber hi-fi',
-    bg:'#0d0d0d', panel:'#111114', panel2:'#161619', border:'#2a2a30',
-    accent:'#e8a020', accentDim:'#7a5010', accentGlow:'rgba(232,160,32,0.15)',
-    green:'#3ecf60', red:'#e03030', blue:'#3090e8',
-    text:'#c8c0b0', textDim:'#555548', seg:'#1a1a10',
-    themeColor:'#e8a020',
-  },
-  matrix: {
-    name:'MATRIX', desc:'Green phosphor terminal',
-    bg:'#000a00', panel:'#000f00', panel2:'#001400', border:'#0a3a0a',
-    accent:'#00ff41', accentDim:'#004d14', accentGlow:'rgba(0,255,65,0.12)',
-    green:'#00ff41', red:'#ff4444', blue:'#00cc33',
-    text:'#88cc88', textDim:'#2a5a2a', seg:'#000800',
-    themeColor:'#00ff41',
-  },
-  ocean: {
-    name:'OCEAN', desc:'Deep sea blue/teal',
-    bg:'#00080f', panel:'#000d18', panel2:'#001020', border:'#0a2a3a',
-    accent:'#00d4ff', accentDim:'#004a6a', accentGlow:'rgba(0,212,255,0.12)',
-    green:'#00ffcc', red:'#ff4466', blue:'#0088ff',
-    text:'#a0d4e8', textDim:'#2a4a5a', seg:'#000610',
-    themeColor:'#00d4ff',
-  },
-  blaze: {
-    name:'BLAZE', desc:'Hot orange fire',
-    bg:'#0f0500', panel:'#180800', panel2:'#200a00', border:'#3a1a00',
-    accent:'#ff6a00', accentDim:'#7a2a00', accentGlow:'rgba(255,106,0,0.15)',
-    green:'#ffcc00', red:'#ff2200', blue:'#ff6a00',
-    text:'#e8c090', textDim:'#5a3a18', seg:'#0a0200',
-    themeColor:'#ff6a00',
-  },
-};
-
-function applyTheme(id) {
-  const t = THEMES[id] || THEMES.punk;
-  localStorage.setItem('pioneer-theme', id);
-  const s = document.documentElement.style;
-  s.setProperty('--bg',          t.bg);
-  s.setProperty('--panel',       t.panel);
-  s.setProperty('--panel2',      t.panel2);
-  s.setProperty('--border',      t.border);
-  s.setProperty('--accent',      t.accent);
-  s.setProperty('--accent-dim',  t.accentDim);
-  s.setProperty('--accent-glow', t.accentGlow);
-  s.setProperty('--green',       t.green);
-  s.setProperty('--red',         t.red);
-  s.setProperty('--blue',        t.blue);
-  s.setProperty('--text',        t.text);
-  s.setProperty('--text-dim',    t.textDim);
-  s.setProperty('--seg',         t.seg);
-  document.querySelector('meta[name="theme-color"]').content = t.themeColor;
-  drawEQ();
-  document.querySelectorAll('.theme-swatch').forEach(el =>
-    el.classList.toggle('active', el.dataset.theme === id));
-}
-
-function buildThemeGrid() {
-  const grid = document.getElementById('themeGrid');
-  const saved = localStorage.getItem('pioneer-theme') || 'punk';
-  grid.innerHTML = '';
-  Object.entries(THEMES).forEach(([id, t]) => {
-    const el = document.createElement('div');
-    el.className = 'theme-swatch' + (id === saved ? ' active' : '');
-    el.dataset.theme = id;
-    el.style.cssText = `background:${t.bg};border-color:${id===saved?'white':'transparent'}`;
-    el.innerHTML = `
-      <div class="theme-swatch-name" style="color:${t.accent}">${t.name}</div>
-      <div class="theme-swatch-desc" style="color:${t.text}">${t.desc}</div>
-      <div class="theme-dots">
-        <div class="theme-dot" style="background:${t.accent};box-shadow:0 0 6px ${t.accent}"></div>
-        <div class="theme-dot" style="background:${t.green};box-shadow:0 0 6px ${t.green}"></div>
-        <div class="theme-dot" style="background:${t.text}"></div>
-      </div>`;
-    el.onclick = () => {
-      applyTheme(id);
-      document.querySelectorAll('.theme-swatch').forEach(s =>
-        s.style.borderColor = s.dataset.theme === id ? 'white' : 'transparent');
-    };
-    grid.appendChild(el);
-  });
-}
-
-// ── State ─────────────────────────────────────────────────────────────────────
-const S = {
-  power:false, volume:0, muted:false, input:'00', mode:'0101',
-  z2power:false, z2volume:0, z2input:'00', bass:0, treble:0,
-};
-
-// ── WebSocket ─────────────────────────────────────────────────────────────────
-let ws = null;
-
-function initWS() {
-  if (ws && ws.readyState === WebSocket.OPEN) return;
-  setConnStatus('connecting');
-  ws = new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host);
-  ws.onopen    = () => ws.send(JSON.stringify({type:'connect'}));
-  ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-    if      (msg.type==='connected')    { setConnStatus('connected'); }
-    else if (msg.type==='disconnected') { setConnStatus('disconnected'); }
-    else if (msg.type==='error')        { setConnStatus('error'); showError(msg.message); }
-    else if (msg.type==='data')         { parseLine(msg.line); }
-    else if (msg.type==='config')       { if(msg.host) document.getElementById('connHost').textContent = msg.host+':'+msg.port; }
-    else if (msg.type==='status')       { document.getElementById('vfdDisplay').textContent = msg.message; }
-  };
-  ws.onclose = () => { ws=null; setConnStatus('disconnected'); };
-  ws.onerror = () => setConnStatus('error');
-}
-
-function toggleConnection() {
-  if (ws && ws.readyState===WebSocket.OPEN) {
-    ws.send(JSON.stringify({type:'disconnect'}));
-    ws.close(); ws=null; setConnStatus('disconnected');
-  } else { initWS(); }
-}
-
-function cmd(c) {
-  if (ws && ws.readyState===WebSocket.OPEN)
-    ws.send(JSON.stringify({type:'command', cmd:c}));
-}
-
-// ── Parse receiver responses ──────────────────────────────────────────────────
-function parseLine(line) {
-  if      (line.startsWith('PWR')) { S.power=line[3]==='0'; renderPower(); }
-  else if (line.startsWith('VOL')) { const v=parseInt(line.substring(3)); if(!isNaN(v)){S.volume=v; renderVolume();} }
-  else if (line.startsWith('MUT')) { S.muted=line[3]==='0'; renderMute(); }
-  else if (line.startsWith('FN'))  { S.input=line.substring(2); renderInput(); }
-  else if (line.startsWith('SR'))  { S.mode=line.substring(2); renderMode(); }
-  else if (line.startsWith('ZV'))  { const v=parseInt(line.substring(2)); if(!isNaN(v)){S.z2volume=v; renderZ2();} }
-  else if (line.startsWith('APR')) { S.z2power=line[3]==='0'; renderZ2(); }
-  else if (line.startsWith('Z2F')) { S.z2input=line.substring(3); renderZ2Input(); }
-  else if (line.startsWith('FL'))  {
-    try {
-      const hex=line.substring(2); let txt='';
-      for(let i=0;i<hex.length-1;i+=2) txt+=String.fromCharCode(parseInt(hex.substring(i,i+2),16));
-      document.getElementById('vfdDisplay').textContent=txt.trim()||'-- -- --';
-    } catch(_){}
-  }
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-function renderPower() {
-  document.getElementById('powerBtn').classList.toggle('on', S.power);
-  const lbl = document.getElementById('powerLabel');
-  lbl.textContent = S.power ? 'POWER ON' : 'STANDBY';
-  lbl.className = 'power-label' + (S.power?' on':'');
-  const ind = document.getElementById('indPower');
-  ind.className = 'vfd-indicator' + (S.power?' active':'');
-  ind.querySelector('span').textContent = S.power ? 'POWER ON' : 'STANDBY';
-}
-function renderVolume() {
-  const db=(S.volume-161)*0.5;
-  const disp=S.volume===0?'---':(db>=0?'+'+db.toFixed(1):db.toFixed(1));
-  document.getElementById('volDb').textContent=disp;
-  document.getElementById('volUnit').textContent=S.volume===0?'':'dB';
-  const sl=document.getElementById('volSlider');
-  sl.value=S.volume; sl.style.setProperty('--pct',(S.volume/185*100)+'%');
-  if(!S.muted) document.getElementById('vfdDisplay').textContent=S.volume===0?'-- -- --':'VOL  '+disp+' dB';
-}
-function renderMute() {
-  const btn=document.getElementById('muteBtn');
-  btn.textContent=S.muted?'🔇  UNMUTE':'MUTE';
-  btn.className='mute-btn'+(S.muted?' muted':'');
-  document.getElementById('volDb').className='vol-db'+(S.muted?' muted':'');
-  document.getElementById('indMute').className='vfd-indicator'+(S.muted?' muted':'');
-  if(S.muted) document.getElementById('vfdDisplay').textContent='MUTED';
-}
-function renderInput() {
-  document.querySelectorAll('.input-chip[data-code]').forEach(el=>el.classList.toggle('active',el.dataset.code===S.input));
-  document.getElementById('indInputName').textContent=INPUTS[S.input]||S.input;
-  document.getElementById('indInput').className='vfd-indicator active';
-}
-function renderMode() {
-  document.querySelectorAll('.mode-item').forEach(el=>el.classList.toggle('active',el.dataset.code===S.mode));
-}
-function renderZ2() {
-  document.getElementById('z2PowerBtn').textContent=S.z2power?'ON':'OFF';
-  document.getElementById('z2PowerBtn').className='toggle-btn'+(S.z2power?' on':'');
-  document.getElementById('z2VolDb').textContent=S.z2volume||'---';
-  const sl=document.getElementById('z2Slider');
-  sl.value=S.z2volume; sl.style.setProperty('--pct',(S.z2volume/81*100)+'%');
-}
-function renderZ2Input() {
-  document.querySelectorAll('.input-chip[data-z2code]').forEach(el=>el.classList.toggle('active',el.dataset.z2code===S.z2input));
-}
-
-// ── EQ ────────────────────────────────────────────────────────────────────────
-function drawEQ() {
-  const c=document.getElementById('eqCanvas');
-  if(!c) return;
-  const ctx=c.getContext('2d');
-  c.width=c.offsetWidth*window.devicePixelRatio;
-  c.height=c.offsetHeight*window.devicePixelRatio;
-  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
-  const W=c.offsetWidth, H=c.offsetHeight, mid=H/2;
-  ctx.clearRect(0,0,W,H);
-  const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(W,mid); ctx.stroke();
-  const bassY=mid-(S.bass/6)*mid*0.8, trebleY=mid-(S.treble/6)*mid*0.8;
-  const path=new Path2D();
-  path.moveTo(0,bassY);
-  path.bezierCurveTo(W*0.25,bassY,W*0.35,mid,W*0.5,mid);
-  path.bezierCurveTo(W*0.65,mid,W*0.75,trebleY,W,trebleY);
-  ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke(path);
-  const fill=new Path2D(path); fill.lineTo(W,mid); fill.lineTo(0,mid); fill.closePath();
-  ctx.fillStyle=accent.replace(')',',0.08)').replace('rgb','rgba'); ctx.fill(fill);
-}
-
-// ── Controls ──────────────────────────────────────────────────────────────────
-function onVolSlider(v) {
-  const db=(v-161)*0.5;
-  document.getElementById('volDb').textContent=v==0?'---':(db>=0?'+'+db.toFixed(1):db.toFixed(1));
-  document.getElementById('volSlider').style.setProperty('--pct',(v/185*100)+'%');
-}
-let volTimer;
-function sendVol(v) { clearTimeout(volTimer); volTimer=setTimeout(()=>cmd(String(v).padStart(3,'0')+'VL'),80); }
-function onZ2Slider(v) {
-  document.getElementById('z2VolDb').textContent=v;
-  document.getElementById('z2Slider').style.setProperty('--pct',(v/81*100)+'%');
-}
-function sendZ2Vol(v) { cmd(String(v).padStart(2,'0')+'ZV'); }
-function toggleZ2Power() { cmd(S.z2power?'APF':'APO'); }
-function onToneSlider(which,v) {
-  const sign=v>0?'+':'';
-  document.getElementById(which+'Val').textContent=sign+v+' dB';
-  S[which]=parseInt(v); drawEQ();
-}
-
-// ── UI helpers ────────────────────────────────────────────────────────────────
-function setConnStatus(s) {
-  document.getElementById('connStatus').className='conn-status '+s;
-  const btn=document.getElementById('connBtn');
-  btn.textContent=s==='connected'?'DISCONNECT':'CONNECT';
-  btn.className='conn-btn'+(s==='connected'?' active':'');
-}
-function showError(msg) { document.getElementById('vfdDisplay').textContent='ERR: '+msg.substring(0,20); }
-function switchTab(name,el) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-  if(name==='tone') setTimeout(drawEQ,50);
-}
-
-// ── Build lists ───────────────────────────────────────────────────────────────
-function buildInputGrid(gridId,codeAttr,sendFn) {
-  const grid=document.getElementById(gridId); grid.innerHTML='';
-  Object.entries(INPUTS).forEach(([code,name])=>{
-    const el=document.createElement('button');
-    el.className='input-chip'; el.textContent=name; el.dataset[codeAttr]=code;
-    el.onclick=()=>sendFn(code); grid.appendChild(el);
-  });
-}
-function buildModeList() {
-  const list=document.getElementById('modeList'); list.innerHTML='';
-  Object.entries(MODES).forEach(([code,name])=>{
-    const el=document.createElement('div');
-    el.className='mode-item'; el.dataset.code=code;
-    el.innerHTML=`<div class="mode-dot"></div><div class="mode-name">${name}</div><div class="mode-code">${code}</div>`;
-    el.onclick=()=>cmd(code+'SR'); list.appendChild(el);
-  });
-}
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-buildThemeGrid();
-applyTheme(localStorage.getItem('pioneer-theme') || 'punk');
-buildInputGrid('inputGrid','code',code=>cmd(code+'FN'));
-buildInputGrid('z2InputGrid','z2code',code=>cmd(code+'ZS'));
-buildModeList();
-window.addEventListener('resize', drawEQ);
-
-// Keyboard shortcuts
-document.addEventListener('keydown', e=>{
-  if(document.activeElement.tagName==='INPUT') return;
-  const map={'ArrowUp':'VU','ArrowDown':'VD','m':'MZ','p':'PZ','ArrowLeft':'CLE','ArrowRight':'CRI','Enter':'CEN','Escape':'CRT'};
-  if(map[e.key]){e.preventDefault();cmd(map[e.key]);}
+app.get('/api/config', (req, res) => {
+  res.json({ host: receiverConfig.host, port: receiverConfig.port });
 });
 
-// Connect — server owns the IP
-initWS();
-</script>
-<script>
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-</script>
-</body>
-</html>
+app.post('/api/config', (req, res) => {
+  const { host, port } = req.body;
+  if (host) receiverConfig.host = host;
+  if (port) receiverConfig.port = parseInt(port);
+  res.json({ ok: true });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// SINGLE PERSISTENT RECEIVER CONNECTION — shared by all browser clients
+// The VSX-1020 only allows one TCP connection at a time, so we hold it here
+// at the server level and broadcast state to all connected browsers.
+// ════════════════════════════════════════════════════════════════════════════
+
+const clients = new Set();   // all connected WebSocket browsers
+let tcpSocket   = null;
+let tcpBuffer   = '';
+let tcpConnected = false;
+let reconnectTimer = null;
+
+function broadcast(type, payload) {
+  const msg = JSON.stringify({ type, ...payload });
+  for (const ws of clients) {
+    if (ws.readyState === ws.OPEN) ws.send(msg);
+  }
+}
+
+function sendTo(ws, type, payload) {
+  if (ws.readyState === ws.OPEN) ws.send(JSON.stringify({ type, ...payload }));
+}
+
+// ── UPnP wake (same 3 SSDP packets the iControlAVA APK sends) ───────────────
+function ssdpWake() {
+  return new Promise((resolve) => {
+    const sock = dgram.createSocket('udp4');
+    const searches = [
+      'M-SEARCH * HTTP/1.1\r\nST: urn:schemas-upnp-org:device:MediaRenderer:1\r\nMX: 3\r\nMAN: "ssdp:discover"\r\nHOST: 239.255.250.250:1900\r\n\r\n',
+      'M-SEARCH * HTTP/1.1\r\nST: urn:schemas-upnp-org:device:Basic:1\r\nMX: 3\r\nMAN: "ssdp:discover"\r\nHOST: 239.255.255.250:1900\r\n\r\n',
+      'M-SEARCH * HTTP/1.1\r\nST: urn:pioneer-co-jp:device:PioControlServer:1\r\nMX: 3\r\nMAN: "ssdp:discover"\r\nHOST: 239.255.255.250:1900\r\n\r\n',
+    ];
+    sock.bind(() => {
+      let i = 0;
+      const sendNext = () => {
+        if (i >= searches.length) { sock.close(); return resolve(); }
+        const msg = Buffer.from(searches[i++]);
+        sock.send(msg, 0, msg.length, 1900, '239.255.255.250', () => setTimeout(sendNext, 150));
+      };
+      sendNext();
+    });
+    sock.on('error', () => { try { sock.close(); } catch (_) {} resolve(); });
+    setTimeout(resolve, 2000);
+  });
+}
+
+// ── Connect (or reconnect) to the receiver ───────────────────────────────────
+async function connectToReceiver() {
+  if (tcpConnected) return;
+  if (tcpSocket) { tcpSocket.destroy(); tcpSocket = null; }
+  clearTimeout(reconnectTimer);
+
+  const { host, port } = receiverConfig;
+  console.log('[SSDP] Sending UPnP wake...');
+  broadcast('status', { message: 'Waking receiver...' });
+  await ssdpWake();
+
+  console.log(`[TCP] Connecting to ${host}:${port}`);
+  broadcast('status', { message: 'Connecting...' });
+
+  tcpSocket = new net.Socket();
+  tcpSocket.setKeepAlive(true, 10000);
+  tcpSocket.setNoDelay(true);
+  tcpSocket.setTimeout(30000);
+
+  tcpSocket.connect(port, host, () => {
+    tcpConnected = true;
+    console.log(`[TCP] Connected to ${host}:${port}`);
+    broadcast('connected', { host, port });
+
+    // Init queries — exact order from APK's AVRThread.getInfo()
+    const queries = ['?V','?F','?RGC','?M','?FL','?L','?P','?VSB','?VHT','?IS','?MC','?SPK','?HO','?PQ','?HA'];
+    queries.forEach((q, i) => {
+      setTimeout(() => {
+        if (tcpSocket && tcpConnected) {
+          console.log(`[TX] ${q}`);
+          tcpSocket.write(q + '\r');
+        }
+      }, i * 100);
+    });
+  });
+
+  tcpSocket.on('data', (data) => {
+    tcpBuffer += data.toString();
+    const lines = tcpBuffer.split(/\r\n|\r|\n/);
+    tcpBuffer = lines.pop();
+    lines.forEach((line) => {
+      const t = line.trim();
+      if (t) {
+        console.log(`[RX] ${t}`);
+        broadcast('data', { line: t });
+      }
+    });
+  });
+
+  tcpSocket.on('timeout', () => {
+    if (tcpSocket && tcpConnected) tcpSocket.write('?P\r');
+  });
+
+  tcpSocket.on('error', (err) => {
+    console.error('[TCP] Error:', err.message);
+    tcpConnected = false;
+    broadcast('error', { message: err.message });
+    scheduleReconnect();
+  });
+
+  tcpSocket.on('close', () => {
+    tcpConnected = false;
+    console.log('[TCP] Disconnected');
+    broadcast('disconnected', {});
+    scheduleReconnect();
+  });
+}
+
+function scheduleReconnect() {
+  if (clients.size === 0) return; // no browsers open, don't bother
+  clearTimeout(reconnectTimer);
+  console.log('[TCP] Reconnecting in 5s...');
+  reconnectTimer = setTimeout(connectToReceiver, 5000);
+}
+
+function sendCommand(cmd) {
+  if (tcpSocket && tcpConnected) {
+    console.log(`[TX] ${cmd}`);
+    tcpSocket.write(cmd + '\r');
+    return true;
+  }
+  return false;
+}
+
+// ── Auto-connect on startup only if host pre-configured via env var ──────────
+if (receiverConfig.host) {
+  console.log('[CONFIG] Receiver pre-configured, auto-connecting...');
+  setTimeout(connectToReceiver, 1000);
+} else {
+  console.log('[CONFIG] No RECEIVER_HOST set — waiting for user to configure via UI');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WebSocket — each browser tab gets a WS, all share the one TCP connection
+// ════════════════════════════════════════════════════════════════════════════
+
+wss.on('connection', (ws) => {
+  clients.add(ws);
+  console.log(`[WS] Browser connected (${clients.size} total)`);
+
+  // Tell this new client the current connection state
+  if (tcpConnected) {
+    sendTo(ws, 'connected', { host: receiverConfig.host, port: receiverConfig.port });
+    // Re-query state so this client gets current values
+    const queries = ['?V','?F','?M','?P','?ZV','?AP'];
+    queries.forEach((q, i) => setTimeout(() => sendCommand(q), i * 80));
+  } else {
+    sendTo(ws, 'disconnected', {});
+  }
+  sendTo(ws, 'config', { host: receiverConfig.host, port: receiverConfig.port });
+
+  ws.on('message', (raw) => {
+    let msg;
+    try { msg = JSON.parse(raw); } catch { return; }
+
+    if (msg.type === 'connect') {
+      if (msg.host) receiverConfig.host = msg.host;
+      if (!tcpConnected) connectToReceiver();
+    } else if (msg.type === 'command') {
+      if (!sendCommand(msg.cmd)) {
+        sendTo(ws, 'error', { message: 'Not connected to receiver' });
+      }
+    } else if (msg.type === 'disconnect') {
+      clearTimeout(reconnectTimer);
+      if (tcpSocket) tcpSocket.destroy();
+    }
+  });
+
+  ws.on('close', () => {
+    clients.delete(ws);
+    console.log(`[WS] Browser disconnected (${clients.size} remaining)`);
+    // Keep TCP connection alive even with no browsers open
+  });
+});
+
+const PORT = process.env.PORT || 8088;
+server.listen(PORT, () => {
+  console.log(`Pioneer Web Remote running on http://0.0.0.0:${PORT}`);
+  console.log(`Receiver: ${receiverConfig.host}:${receiverConfig.port}`);
+});
