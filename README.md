@@ -31,7 +31,7 @@ docker run -d \
   -p 8088:8088 \
   -e RECEIVER_HOST=192.168.1.100 \
   -e RECEIVER_PORT=23 \
-  ghcr.io/YOURUSERNAME/pioneer-remote:latest
+  ghcr.io/schmiesus/pioneer-remote:latest
 ```
 
 Open `http://YOUR-SERVER-IP:8088` in any browser.
@@ -39,7 +39,7 @@ Open `http://YOUR-SERVER-IP:8088` in any browser.
 ### Or with docker-compose
 
 ```bash
-git clone https://github.com/YOURUSERNAME/pioneer-remote.git
+git clone https://github.com/schmiesus/pioneer-remote.git
 cd pioneer-remote
 ```
 
