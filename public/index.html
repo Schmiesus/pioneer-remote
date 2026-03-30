@@ -365,7 +365,7 @@
           oninput="onVolSlider(this.value)" onchange="sendVol(this.value)" style="--pct:0%">
         <button class="btn-round" onclick="cmd('VU')">+</button>
       </div>
-      <button class="mute-btn" id="muteBtn" onclick="cmd('MZ')">MUTE</button>
+      <button class="mute-btn" id="muteBtn" onclick="cmd(S.muted?'MF':'MO')">MUTE</button>
     </div>
 
     <div class="card">
@@ -833,7 +833,7 @@ window.addEventListener('resize', drawEQ);
 // Keyboard shortcuts
 document.addEventListener('keydown', e=>{
   if(document.activeElement.tagName==='INPUT') return;
-  const map={'ArrowUp':'VU','ArrowDown':'VD','m':'MZ','p':'PZ','ArrowLeft':'CLE','ArrowRight':'CRI','Enter':'CEN','Escape':'CRT'};
+  const map={'ArrowUp':'VU','ArrowDown':'VD','m':S.muted?'MF':'MO','p':'PZ','ArrowLeft':'CLE','ArrowRight':'CRI','Enter':'CEN','Escape':'CRT'};
   if(map[e.key]){e.preventDefault();cmd(map[e.key]);}
 });
 
