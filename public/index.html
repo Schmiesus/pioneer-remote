@@ -7,59 +7,101 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pioneer">
-<meta name="theme-color" content="#ff2d6b">
+<meta name="theme-color" content="#1C1B1F">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Pioneer Remote</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
+  /* ── MD3 Dark Tokens ── */
   :root {
-    --bg:        #0a000f;
-    --panel:     #0f0018;
-    --panel2:    #160020;
-    --border:    #3a1245;
-    --accent:    #ff2d6b;
-    --accent-dim:#7a0f35;
-    --accent-glow:rgba(255,45,107,0.15);
-    --green:     #bf5fff;
-    --red:       #ff2d6b;
-    --blue:      #c03aff;
-    --text:      #d8b0e8;
-    --text-dim:  #5a3a6a;
-    --seg:       #08000e;
-    --font-display: 'VT323', monospace;
+    --md-sys-color-primary:            #D0BCFF;
+    --md-sys-color-on-primary:         #381E72;
+    --md-sys-color-primary-container:  #4F378B;
+    --md-sys-color-on-primary-container: #EADDFF;
+    --md-sys-color-secondary:          #CCC2DC;
+    --md-sys-color-on-secondary:       #332D41;
+    --md-sys-color-secondary-container:#4A4458;
+    --md-sys-color-on-secondary-container: #E8DEF8;
+    --md-sys-color-tertiary:           #EFB8C8;
+    --md-sys-color-on-tertiary:        #492532;
+    --md-sys-color-tertiary-container: #633B48;
+    --md-sys-color-error:              #F2B8B8;
+    --md-sys-color-on-error:           #601410;
+    --md-sys-color-error-container:    #8C1D18;
+    --md-sys-color-background:         #1C1B1F;
+    --md-sys-color-on-background:      #E6E1E5;
+    --md-sys-color-surface:            #1C1B1F;
+    --md-sys-color-on-surface:         #E6E1E5;
+    --md-sys-color-surface-variant:    #49454F;
+    --md-sys-color-on-surface-variant: #CAC4D0;
+    --md-sys-color-outline:            #938F99;
+    --md-sys-color-outline-variant:    #49454F;
+    --md-sys-color-surface-container-lowest:  #0F0D13;
+    --md-sys-color-surface-container-low:     #1D1B20;
+    --md-sys-color-surface-container:         #211F26;
+    --md-sys-color-surface-container-high:    #2B2930;
+    --md-sys-color-surface-container-highest: #36343B;
+    --md-sys-color-inverse-surface:    #E6E1E5;
+    --md-sys-color-inverse-on-surface: #313033;
+    --md-sys-color-inverse-primary:    #6750A4;
+
+    --md-sys-elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
+    --md-sys-elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);
+    --md-sys-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
+    background: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    font-family: 'Roboto', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-bottom: 80px; /* bottom nav height */
   }
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
-    pointer-events: none;
-    z-index: 1000;
+  /* ── Top App Bar ── */
+  .top-app-bar {
+    background: var(--md-sys-color-surface-container);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--md-sys-elevation-2);
   }
-
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(191,95,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(191,95,255,0.03) 1px, transparent 1px);
-    background-size: 32px 32px;
-    pointer-events: none;
-    z-index: 0;
+  .top-app-bar-title {
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--md-sys-color-on-surface);
+    flex: 1;
+    letter-spacing: 0;
   }
+  .top-app-bar-subtitle {
+    font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: 'Roboto Mono', monospace;
+  }
+  .connection-indicator {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--md-sys-color-outline);
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .connection-indicator.connected  { background: #6DD58C; box-shadow: 0 0 8px #6DD58C; }
+  .connection-indicator.connecting { background: var(--md-sys-color-primary); animation: pulse 1s infinite; }
+  .connection-indicator.error      { background: var(--md-sys-color-error); }
 
-  .app {
-    position: relative; z-index: 1;
-    max-width: 480px;
+  /* ── Content ── */
+  .content {
+    max-width: 600px;
     margin: 0 auto;
     padding: 16px;
     display: flex;
@@ -67,381 +109,627 @@
     gap: 12px;
   }
 
-  /* VFD */
-  .vfd-header {
-    background: var(--seg);
-    border: 1px solid var(--accent-dim);
-    border-radius: 8px;
-    padding: 14px 18px;
-    position: relative;
-    overflow: hidden;
+  /* ── MD3 Cards ── */
+  .md-card {
+    background: var(--md-sys-color-surface-container);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--md-sys-elevation-1);
   }
-  .vfd-header::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-    pointer-events: none;
+  .md-card-elevated {
+    background: var(--md-sys-color-surface-container-high);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--md-sys-elevation-2);
   }
-  .vfd-brand {
-    font-family: var(--font-display);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 8px;
-    color: var(--accent-dim);
+  .md-card-header {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    color: var(--md-sys-color-primary);
+    margin-bottom: 16px;
   }
-  .vfd-display {
-    font-family: var(--font-display);
-    font-size: 28px;
-    color: var(--accent);
-    text-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent-glow);
-    letter-spacing: 2px;
-    min-height: 36px;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  .vfd-sub { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
-  .vfd-indicator { font-family: var(--font-display); font-size: 10px; letter-spacing: 2px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
-  .vfd-indicator.active { color: var(--accent); }
-  .vfd-indicator.muted  { color: var(--red); }
-  .vfd-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 4px currentColor; }
 
-  /* Connection bar */
-  .conn-bar {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
+  /* ── Power / Hero card ── */
+  .hero-card {
+    background: linear-gradient(135deg, var(--md-sys-color-primary-container), var(--md-sys-color-secondary-container));
+    border-radius: 28px;
+    padding: 24px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
+    box-shadow: var(--md-sys-elevation-3);
   }
-  .conn-status { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; transition: background 0.3s; }
-  .conn-status.connected  { background: var(--green); box-shadow: 0 0 8px var(--green); }
-  .conn-status.connecting { background: var(--accent); animation: pulse 1s infinite; }
-  .conn-status.error      { background: var(--red); }
-  .conn-host { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--text-dim); flex: 1; }
-  .conn-ip-input {
-    flex: 1; font-family: 'Share Tech Mono', monospace; font-size: 13px;
-    color: var(--text); background: transparent; border: none; outline: none;
-  }
-  .conn-ip-input::placeholder { color: var(--text-dim); }
-  .conn-btn {
-    font-family: var(--font-display);
-    font-size: 14px;
-    letter-spacing: 2px;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--text);
+  .power-fab {
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    border: none;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
     cursor: pointer;
-    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    box-shadow: var(--md-sys-elevation-3);
   }
-  .conn-btn:hover  { border-color: var(--accent); color: var(--accent); }
-  .conn-btn.active { border-color: var(--red); color: var(--red); }
+  .power-fab .material-icons-round { font-size: 32px; }
+  .power-fab.on {
+    background: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-primary-container);
+    box-shadow: 0 0 20px rgba(208,188,255,0.3);
+  }
+  .power-fab:active { transform: scale(0.94); }
+  .hero-info { flex: 1; }
+  .hero-status {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--md-sys-color-on-primary-container);
+    margin-bottom: 4px;
+  }
+  .hero-input {
+    font-size: 14px;
+    color: var(--md-sys-color-on-secondary-container);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-input .material-icons-round { font-size: 16px; }
 
-  /* Card */
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
+  /* ── Volume ── */
+  .volume-display {
+    text-align: center;
+    padding: 8px 0 16px;
   }
-  .card-label {
-    font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 4px;
-    color: var(--text-dim);
-    margin-bottom: 14px;
+  .volume-value {
+    font-size: 56px;
+    font-weight: 300;
+    font-family: 'Roboto Mono', monospace;
+    color: var(--md-sys-color-primary);
+    line-height: 1;
+  }
+  .volume-value.muted { color: var(--md-sys-color-error); }
+  .volume-unit {
+    font-size: 14px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-top: 4px;
+    letter-spacing: 2px;
   }
 
-  /* Power */
-  .power-strip { display: flex; gap: 10px; align-items: center; }
-  .power-btn {
-    width: 52px; height: 52px;
+  /* MD3 Slider */
+  .volume-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .volume-row .material-icons-round {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 20px;
+  }
+  .md-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 16px;
+    border-radius: 8px;
+    background: var(--md-sys-color-surface-container-highest);
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .md-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
     border-radius: 50%;
-    border: 2px solid var(--border);
-    background: var(--panel2);
+    background: var(--md-sys-color-primary);
+    cursor: pointer;
+    box-shadow: var(--md-sys-elevation-2);
+    transition: transform 0.1s;
+  }
+  .md-slider:active::-webkit-slider-thumb { transform: scale(1.2); }
+
+  /* Volume track fill */
+  .md-slider {
+    background: linear-gradient(to right,
+      var(--md-sys-color-primary) var(--pct, 0%),
+      var(--md-sys-color-surface-container-highest) var(--pct, 0%));
+  }
+
+  /* ── MD3 Filled Button ── */
+  .md-btn-filled {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 100px;
+    border: none;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--md-sys-elevation-1);
+  }
+  .md-btn-filled:active { transform: scale(0.96); box-shadow: none; }
+
+  /* ── MD3 Tonal Button ── */
+  .md-btn-tonal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 100px;
+    border: none;
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .md-btn-tonal:active { transform: scale(0.96); }
+  .md-btn-tonal.active {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  /* ── MD3 Outlined Button ── */
+  .md-btn-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 100px;
+    border: 1px solid var(--md-sys-color-outline);
+    background: transparent;
+    color: var(--md-sys-color-primary);
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .md-btn-outlined:active { transform: scale(0.96); }
+  .md-btn-outlined.danger { color: var(--md-sys-color-error); border-color: var(--md-sys-color-error); }
+
+  /* ── MD3 Icon Button ── */
+  .md-icon-btn {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
     flex-shrink: 0;
   }
-  .power-btn svg { width: 22px; height: 22px; }
-  .power-btn.on { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 16px var(--accent-glow); }
-  .power-info { flex: 1; }
-  .power-label { font-family: var(--font-display); font-size: 18px; color: var(--text-dim); letter-spacing: 2px; }
-  .power-label.on { color: var(--accent); }
-  .power-model { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+  .md-icon-btn:hover  { background: rgba(208,188,255,0.08); }
+  .md-icon-btn:active { background: rgba(208,188,255,0.12); transform: scale(0.9); }
+  .md-icon-btn .material-icons-round { font-size: 24px; }
 
-  /* Volume */
-  .vol-display { text-align: center; margin: 4px 0 12px; }
-  .vol-db { font-family: var(--font-display); font-size: 48px; color: var(--accent); text-shadow: 0 0 16px var(--accent); letter-spacing: 1px; }
-  .vol-db.muted { color: var(--red); }
-  .vol-unit { font-family: var(--font-display); font-size: 14px; color: var(--text-dim); letter-spacing: 3px; margin-top: 2px; }
-  .vol-controls { display: flex; align-items: center; gap: 12px; }
-  .vol-slider {
-    flex: 1; -webkit-appearance: none;
-    height: 4px; border-radius: 2px;
-    background: linear-gradient(to right, var(--accent) var(--pct, 0%), var(--border) var(--pct, 0%));
-    outline: none; cursor: pointer;
+  /* ── Mute chip ── */
+  .mute-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--md-sys-color-outline);
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
   }
-  .vol-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 18px; height: 18px;
-    border-radius: 50%; background: var(--accent);
-    box-shadow: 0 0 8px var(--accent); cursor: pointer;
+  .mute-chip.muted {
+    border-color: var(--md-sys-color-error);
+    background: rgba(242,184,184,0.08);
+    color: var(--md-sys-color-error);
   }
-  .btn-round {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 1px solid var(--border); background: var(--panel2);
-    color: var(--text); cursor: pointer;
+  .mute-chip .material-icons-round { font-size: 18px; }
+
+  /* ── Input chips ── */
+  .input-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .input-chip-item {
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .input-chip-item:active { transform: scale(0.95); }
+  .input-chip-item.active {
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    border-color: transparent;
+  }
+
+  /* ── Bottom Navigation ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: var(--md-sys-color-surface-container);
+    display: flex;
+    z-index: 100;
+    box-shadow: 0 -1px 0 var(--md-sys-color-outline-variant);
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    padding-bottom: 4px;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-item.active { color: var(--md-sys-color-primary); }
+  .nav-indicator {
+    width: 64px; height: 32px;
+    border-radius: 16px;
+    background: transparent;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; transition: all 0.1s; flex-shrink: 0; user-select: none;
+    transition: background 0.2s;
   }
-  .btn-round:active { transform: scale(0.9); }
-  .btn-round:hover  { border-color: var(--accent); color: var(--accent); }
-  .mute-btn {
-    padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px;
-    background: transparent; font-family: var(--font-display); font-size: 14px;
-    letter-spacing: 2px; color: var(--text-dim); cursor: pointer; transition: all 0.15s;
-    margin-top: 12px; width: 100%;
-  }
-  .mute-btn.muted { border-color: var(--red); color: var(--red); background: rgba(255,45,107,0.08); }
+  .nav-item.active .nav-indicator { background: var(--md-sys-color-primary-container); }
+  .nav-item .material-icons-round { font-size: 24px; }
+  .nav-label { font-size: 12px; font-weight: 500; letter-spacing: 0.5px; }
 
-  /* Input grid */
-  .input-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .input-chip {
-    padding: 8px 6px; border: 1px solid var(--border); border-radius: 6px;
-    background: var(--panel2); font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 600; color: var(--text-dim);
-    cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.2;
-  }
-  .input-chip:hover  { border-color: var(--accent-dim); color: var(--text); }
-  .input-chip.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent); }
-
-  /* Tabs */
-  .tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
-  .tab {
-    flex: 1; padding: 8px 4px; border-radius: 7px; border: none; background: transparent;
-    font-family: var(--font-display); font-size: 13px; letter-spacing: 1.5px;
-    color: var(--text-dim); cursor: pointer; transition: all 0.15s; text-align: center;
-  }
-  .tab.active { background: var(--panel2); color: var(--accent); border: 1px solid var(--border); }
+  /* ── Tab panels ── */
   .tab-panel { display: none; }
   .tab-panel.active { display: flex; flex-direction: column; gap: 12px; }
 
-  /* D-pad */
-  .dpad { display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(3, 52px); gap: 6px; margin: 0 auto; width: fit-content; }
+  /* ── D-pad ── */
+  .dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    grid-template-rows: repeat(3, 64px);
+    gap: 8px;
+    margin: 0 auto;
+    width: fit-content;
+  }
   .dpad-btn {
-    width: 52px; height: 52px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--panel2); color: var(--text); cursor: pointer;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface);
+    cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; transition: all 0.1s; user-select: none;
+    transition: all 0.15s;
   }
-  .dpad-btn:active { transform: scale(0.9); }
-  .dpad-btn:hover  { border-color: var(--accent); }
-  .dpad-btn.center { border-color: var(--accent-dim); background: var(--accent-glow); font-family: var(--font-display); font-size: 18px; color: var(--accent); font-weight: 700; }
-  .dpad-btn.empty  { visibility: hidden; }
-  .nav-extras { display: flex; gap: 8px; margin-top: 8px; }
-  .nav-btn {
-    flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 7px;
-    background: var(--panel2); font-family: var(--font-display); font-size: 13px;
-    letter-spacing: 2px; color: var(--text-dim); cursor: pointer; text-align: center; transition: all 0.15s;
+  .dpad-btn:active { transform: scale(0.9); background: var(--md-sys-color-secondary-container); }
+  .dpad-btn .material-icons-round { font-size: 28px; }
+  .dpad-btn.center {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
   }
-  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .dpad-btn.empty { visibility: hidden; }
 
-  /* Tone */
-  .tone-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-  .tone-label { font-family: var(--font-display); font-size: 13px; letter-spacing: 2px; color: var(--text-dim); width: 60px; flex-shrink: 0; }
-  .tone-val   { font-family: 'Share Tech Mono', monospace; font-size: 13px; width: 48px; text-align: right; color: var(--accent); flex-shrink: 0; }
-  .tone-slider { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--border); outline: none; cursor: pointer; }
-  .tone-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-  .eq-canvas { width: 100%; height: 70px; }
-
-  /* Zone 2 */
-  .zone2-power { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
-  .toggle-btn {
-    padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--panel2); font-family: var(--font-display); font-size: 14px;
-    letter-spacing: 2px; color: var(--text-dim); cursor: pointer; transition: all 0.15s;
+  /* ── Mode list ── */
+  .mode-list { display: flex; flex-direction: column; }
+  .mode-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    gap: 16px;
   }
-  .toggle-btn.on { border-color: var(--green); color: var(--green); background: rgba(191,95,255,0.08); }
+  .mode-item:hover  { background: rgba(208,188,255,0.08); }
+  .mode-item.active { background: var(--md-sys-color-secondary-container); }
+  .mode-icon { color: var(--md-sys-color-on-surface-variant); }
+  .mode-item.active .mode-icon { color: var(--md-sys-color-primary); }
+  .mode-name { font-size: 14px; flex: 1; }
+  .mode-item.active .mode-name { color: var(--md-sys-color-on-secondary-container); font-weight: 500; }
+  .mode-code { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--md-sys-color-outline); }
 
-  /* Modes */
-  .mode-list { display: flex; flex-direction: column; gap: 4px; }
-  .mode-item { display: flex; align-items: center; padding: 10px 14px; border-radius: 7px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s; gap: 12px; }
-  .mode-item:hover { background: var(--panel2); }
-  .mode-item.active { background: var(--accent-glow); border-color: var(--accent-dim); }
-  .mode-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; transition: all 0.15s; }
-  .mode-item.active .mode-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-  .mode-name { font-size: 14px; font-weight: 500; flex: 1; }
-  .mode-item.active .mode-name { color: var(--accent); }
-  .mode-code { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); }
+  /* ── Tone ── */
+  .tone-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .tone-label { font-size: 14px; font-weight: 500; color: var(--md-sys-color-on-surface-variant); width: 60px; }
+  .tone-val { font-family: 'Roboto Mono', monospace; font-size: 13px; color: var(--md-sys-color-primary); width: 48px; text-align: right; }
+  .eq-canvas { width: 100%; height: 80px; border-radius: 8px; }
 
-  /* Theme picker */
-  .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .theme-swatch {
-    border-radius: 10px; border: 2px solid transparent;
-    padding: 14px 12px; cursor: pointer; transition: all 0.2s;
+  /* ── Zone 2 ── */
+  .zone-power-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .zone-power-label { font-size: 16px; font-weight: 500; }
+
+  /* ── MD3 Switch ── */
+  .md-switch {
+    width: 52px; height: 32px;
+    border-radius: 16px;
+    border: 2px solid var(--md-sys-color-outline);
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    flex-shrink: 0;
   }
-  .theme-swatch.active { border-color: white !important; box-shadow: 0 0 16px rgba(255,255,255,0.15); }
-  .theme-swatch:active { transform: scale(0.96); }
-  .theme-swatch-name { font-family: 'VT323', monospace; font-size: 20px; letter-spacing: 2px; margin-bottom: 4px; }
-  .theme-swatch-desc { font-size: 11px; opacity: 0.6; line-height: 1.3; }
-  .theme-dots { display: flex; gap: 5px; margin-top: 8px; }
-  .theme-dot  { width: 10px; height: 10px; border-radius: 50%; }
+  .md-switch::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--md-sys-color-outline);
+    top: 50%; left: 4px;
+    transform: translateY(-50%);
+    transition: all 0.2s;
+  }
+  .md-switch.on {
+    background: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+  }
+  .md-switch.on::after {
+    background: var(--md-sys-color-on-primary);
+    left: calc(100% - 20px);
+    width: 24px; height: 24px;
+    top: 50%;
+  }
 
-  /* Info banner */
+  /* ── Settings ── */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    gap: 16px;
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-icon { color: var(--md-sys-color-primary); }
+  .settings-text { flex: 1; }
+  .settings-title { font-size: 16px; font-weight: 400; }
+  .settings-subtitle { font-size: 12px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+  .md-text-field {
+    width: 100%;
+    background: var(--md-sys-color-surface-container-highest);
+    border: none;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid var(--md-sys-color-outline);
+    padding: 16px 12px 8px;
+    color: var(--md-sys-color-on-surface);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    outline: none;
+    margin-top: 8px;
+    transition: border-color 0.2s;
+  }
+  .md-text-field:focus { border-bottom-color: var(--md-sys-color-primary); }
+  .md-text-field::placeholder { color: var(--md-sys-color-outline); }
+
+  /* ── Theme grid ── */
+  .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .theme-card {
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-card.active { border-color: var(--md-sys-color-primary); }
+  .theme-card-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .theme-card-desc { font-size: 11px; opacity: 0.7; }
+  .theme-dots { display: flex; gap: 6px; margin-top: 10px; }
+  .theme-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .theme-check {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .theme-card.active .theme-check { display: flex; }
+  .theme-check .material-icons-round { font-size: 14px; }
+
+  /* ── Info banner ── */
   .info-banner {
-    padding: 14px; background: rgba(0,0,30,0.5);
-    border-radius: 10px; border: 1px solid rgba(192,58,255,0.3);
+    background: rgba(208,188,255,0.08);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    border: 1px solid rgba(208,188,255,0.2);
   }
+  .info-banner .material-icons-round { color: var(--md-sys-color-primary); font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .info-banner-text { font-size: 13px; color: var(--md-sys-color-on-surface-variant); line-height: 1.5; }
+
+  /* ── Nav extras ── */
+  .nav-extras { display: flex; gap: 8px; margin-top: 12px; }
 
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--md-sys-color-outline-variant); border-radius: 2px; }
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- VFD Display -->
-  <div class="vfd-header">
-    <div class="vfd-brand">Pioneer</div>
-    <div class="vfd-display" id="vfdDisplay">-- -- --</div>
-    <div class="vfd-sub">
-      <div class="vfd-indicator" id="indPower"><div class="vfd-dot"></div><span>STANDBY</span></div>
-      <div class="vfd-indicator" id="indInput"><div class="vfd-dot"></div><span id="indInputName">--</span></div>
-      <div class="vfd-indicator" id="indMute"><div class="vfd-dot"></div>MUTE</div>
-    </div>
+<!-- Top App Bar -->
+<div class="top-app-bar">
+  <div class="connection-indicator" id="connStatus"></div>
+  <div style="flex:1">
+    <div class="top-app-bar-title">Pioneer VSX</div>
+    <div class="top-app-bar-subtitle" id="connHost">Connecting...</div>
   </div>
+  <button class="md-icon-btn" id="connBtn" onclick="toggleConnection()" title="Disconnect">
+    <span class="material-icons-round">settings_ethernet</span>
+  </button>
+</div>
 
-  <!-- Connection bar -->
-  <div class="conn-bar">
-    <div class="conn-status" id="connStatus"></div>
-    <span class="conn-host" id="connHost" style="display:none"></span>
-    <input class="conn-ip-input" id="connIpInput" type="text" placeholder="Receiver IP  e.g. 192.168.1.100" spellcheck="false" style="display:none">
-    <button class="conn-btn" id="connBtn" onclick="toggleConnection()">CONNECT</button>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('main',this)">MAIN</button>
-    <button class="tab" onclick="switchTab('zone2',this)">ZONE2</button>
-    <button class="tab" onclick="switchTab('tone',this)">TONE</button>
-    <button class="tab" onclick="switchTab('mode',this)">MODE</button>
-    <button class="tab" onclick="switchTab('nav',this)">NAV</button>
-    <button class="tab" onclick="switchTab('settings',this)">⚙</button>
-  </div>
+<!-- Content -->
+<div class="content">
 
   <!-- MAIN TAB -->
   <div class="tab-panel active" id="tab-main">
-    <div class="card">
-      <div class="power-strip">
-        <button class="power-btn" id="powerBtn" onclick="cmd('PZ')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round">
-            <path d="M12 2v6M19.07 4.93A10 10 0 1 1 4.93 4.93"/>
-          </svg>
-        </button>
-        <div class="power-info">
-          <div class="power-label" id="powerLabel">STANDBY</div>
-          <div class="power-model">Pioneer VSX Series</div>
+
+    <!-- Hero card -->
+    <div class="hero-card">
+      <button class="power-fab" id="powerBtn" onclick="cmd('PZ')">
+        <span class="material-icons-round">power_settings_new</span>
+      </button>
+      <div class="hero-info">
+        <div class="hero-status" id="powerLabel">Standby</div>
+        <div class="hero-input">
+          <span class="material-icons-round">input</span>
+          <span id="heroInput">--</span>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">VOLUME</div>
-      <div class="vol-display">
-        <div class="vol-db" id="volDb">---</div>
-        <div class="vol-unit" id="volUnit">dB</div>
+    <!-- Volume -->
+    <div class="md-card-elevated">
+      <div class="md-card-header">Volume</div>
+      <div class="volume-display">
+        <div class="volume-value" id="volDb">---</div>
+        <div class="volume-unit" id="volUnit">dB</div>
       </div>
-      <div class="vol-controls">
-        <button class="btn-round" onclick="cmd('VD')">−</button>
-        <input class="vol-slider" id="volSlider" type="range" min="0" max="185" value="0"
+      <div class="volume-row">
+        <span class="material-icons-round">volume_down</span>
+        <input class="md-slider" id="volSlider" type="range" min="0" max="185" value="0"
           oninput="onVolSlider(this.value)" onchange="sendVol(this.value)" style="--pct:0%">
-        <button class="btn-round" onclick="cmd('VU')">+</button>
+        <span class="material-icons-round">volume_up</span>
       </div>
-      <button class="mute-btn" id="muteBtn" onclick="cmd('MZ')">MUTE</button>
+      <div style="display:flex;gap:8px">
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('VD')">
+          <span class="material-icons-round">remove</span>
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('VU')">
+          <span class="material-icons-round">add</span>
+        </button>
+      </div>
+      <button class="mute-chip" id="muteBtn" onclick="cmd(S.muted?'MF':'MO')">
+        <span class="material-icons-round" id="muteIcon">volume_up</span>
+        <span id="muteLabel">Mute</span>
+      </button>
     </div>
 
-    <div class="card">
-      <div class="card-label">INPUT SELECT</div>
-      <div class="input-grid" id="inputGrid"></div>
+    <!-- Input -->
+    <div class="md-card">
+      <div class="md-card-header">Input Source</div>
+      <div class="input-chips" id="inputGrid"></div>
     </div>
+
   </div>
 
   <!-- ZONE 2 TAB -->
   <div class="tab-panel" id="tab-zone2">
-    <div class="card">
-      <div class="card-label">ZONE 2</div>
-      <div class="zone2-power">
-        <span style="font-size:14px;font-weight:600;letter-spacing:1px">Power</span>
-        <button class="toggle-btn" id="z2PowerBtn" onclick="toggleZ2Power()">OFF</button>
+    <div class="md-card-elevated">
+      <div class="zone-power-row">
+        <div class="zone-power-label">Zone 2 Power</div>
+        <button class="md-switch" id="z2PowerSwitch" onclick="toggleZ2Power()"></button>
       </div>
-      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
-        <div class="card-label">ZONE 2 VOLUME</div>
-        <div class="vol-display">
-          <div class="vol-db" id="z2VolDb" style="font-size:36px">---</div>
-        </div>
-        <div class="vol-controls">
-          <button class="btn-round" onclick="cmd('ZD')">−</button>
-          <input class="vol-slider" id="z2Slider" type="range" min="0" max="81" value="0"
-            style="--pct:0%" onchange="sendZ2Vol(this.value)" oninput="onZ2Slider(this.value)">
-          <button class="btn-round" onclick="cmd('ZU')">+</button>
-        </div>
+      <div class="md-card-header">Volume</div>
+      <div class="volume-display">
+        <div class="volume-value" id="z2VolDb" style="font-size:40px">---</div>
+      </div>
+      <div class="volume-row">
+        <span class="material-icons-round">volume_down</span>
+        <input class="md-slider" id="z2Slider" type="range" min="0" max="81" value="0"
+          style="--pct:0%" onchange="sendZ2Vol(this.value)" oninput="onZ2Slider(this.value)">
+        <span class="material-icons-round">volume_up</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('ZD')">
+          <span class="material-icons-round">remove</span>
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('ZU')">
+          <span class="material-icons-round">add</span>
+        </button>
       </div>
     </div>
-    <div class="card">
-      <div class="card-label">ZONE 2 INPUT</div>
-      <div class="input-grid" id="z2InputGrid"></div>
+    <div class="md-card">
+      <div class="md-card-header">Zone 2 Input</div>
+      <div class="input-chips" id="z2InputGrid"></div>
     </div>
   </div>
 
   <!-- TONE TAB -->
   <div class="tab-panel" id="tab-tone">
     <div class="info-banner">
-      <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue)">
-        ⚠ Requires Tone Control enabled:<br>System Setup → Audio → Tone Control
-      </span>
+      <span class="material-icons-round">info</span>
+      <div class="info-banner-text">Tone controls require Tone Control to be enabled in System Setup → Audio.</div>
     </div>
-    <div class="card">
-      <div class="card-label">BASS / TREBLE</div>
+    <div class="md-card-elevated">
+      <div class="md-card-header">Bass &amp; Treble</div>
       <div class="tone-row">
-        <div class="tone-label">BASS</div>
-        <input class="tone-slider" id="bassSlider" type="range" min="-6" max="6" value="0" oninput="onToneSlider('bass',this.value)">
+        <div class="tone-label">Bass</div>
+        <input class="md-slider" id="bassSlider" type="range" min="-6" max="6" value="0" style="--pct:50%" oninput="onToneSlider('bass',this.value)">
         <div class="tone-val" id="bassVal">0 dB</div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:16px">
-        <button class="nav-btn" onclick="cmd('BD')">BASS −</button>
-        <button class="nav-btn" onclick="cmd('BI')">BASS +</button>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('BD')">
+          <span class="material-icons-round">remove</span> Bass
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('BI')">
+          <span class="material-icons-round">add</span> Bass
+        </button>
       </div>
       <div class="tone-row">
-        <div class="tone-label">TREBLE</div>
-        <input class="tone-slider" id="trebleSlider" type="range" min="-6" max="6" value="0" oninput="onToneSlider('treble',this.value)">
+        <div class="tone-label">Treble</div>
+        <input class="md-slider" id="trebleSlider" type="range" min="-6" max="6" value="0" style="--pct:50%" oninput="onToneSlider('treble',this.value)">
         <div class="tone-val" id="trebleVal">0 dB</div>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="nav-btn" onclick="cmd('TD')">TREBLE −</button>
-        <button class="nav-btn" onclick="cmd('TI')">TREBLE +</button>
+      <div style="display:flex;gap:8px">
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('TD')">
+          <span class="material-icons-round">remove</span> Treble
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('TI')">
+          <span class="material-icons-round">add</span> Treble
+        </button>
       </div>
     </div>
-    <div class="card">
-      <div class="card-label">EQ CURVE</div>
+    <div class="md-card">
+      <div class="md-card-header">EQ Curve</div>
       <canvas class="eq-canvas" id="eqCanvas"></canvas>
     </div>
   </div>
 
   <!-- MODE TAB -->
   <div class="tab-panel" id="tab-mode">
-    <div class="card">
-      <div class="card-label">LISTENING MODE</div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="nav-btn" onclick="cmd('MD')">◀ PREV</button>
-        <button class="nav-btn" onclick="cmd('MC')">NEXT ▶</button>
+    <div class="md-card">
+      <div class="md-card-header">Listening Mode</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('MD')">
+          <span class="material-icons-round">skip_previous</span> Prev
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('MC')">
+          Next <span class="material-icons-round">skip_next</span>
+        </button>
       </div>
       <div class="mode-list" id="modeList"></div>
     </div>
@@ -449,57 +737,89 @@
 
   <!-- NAV TAB -->
   <div class="tab-panel" id="tab-nav">
-    <div class="card">
-      <div class="card-label">NAVIGATION</div>
+    <div class="md-card">
+      <div class="md-card-header">Navigation</div>
       <div class="dpad">
         <div class="dpad-btn empty"></div>
-        <button class="dpad-btn" onclick="cmd('CUP')">▲</button>
+        <button class="dpad-btn" onclick="cmd('CUP')"><span class="material-icons-round">keyboard_arrow_up</span></button>
         <div class="dpad-btn empty"></div>
-        <button class="dpad-btn" onclick="cmd('CLE')">◀</button>
-        <button class="dpad-btn center" onclick="cmd('CEN')">OK</button>
-        <button class="dpad-btn" onclick="cmd('CRI')">▶</button>
+        <button class="dpad-btn" onclick="cmd('CLE')"><span class="material-icons-round">keyboard_arrow_left</span></button>
+        <button class="dpad-btn center" onclick="cmd('CEN')"><span class="material-icons-round">radio_button_checked</span></button>
+        <button class="dpad-btn" onclick="cmd('CRI')"><span class="material-icons-round">keyboard_arrow_right</span></button>
         <div class="dpad-btn empty"></div>
-        <button class="dpad-btn" onclick="cmd('CDN')">▼</button>
+        <button class="dpad-btn" onclick="cmd('CDN')"><span class="material-icons-round">keyboard_arrow_down</span></button>
         <div class="dpad-btn empty"></div>
       </div>
       <div class="nav-extras">
-        <button class="nav-btn" onclick="cmd('CRT')">RETURN</button>
-        <button class="nav-btn" onclick="cmd('CHM')">HOME</button>
-        <button class="nav-btn" onclick="cmd('CQS')">STATUS</button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('CRT')">
+          <span class="material-icons-round">arrow_back</span> Return
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('CHM')">
+          <span class="material-icons-round">home</span> Home
+        </button>
+        <button class="md-btn-tonal" style="flex:1" onclick="cmd('CQS')">
+          <span class="material-icons-round">info</span> Status
+        </button>
       </div>
     </div>
   </div>
 
   <!-- SETTINGS TAB -->
   <div class="tab-panel" id="tab-settings">
-    <div class="card" id="receiverConfigCard">
-      <div class="card-label">RECEIVER</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px">IP ADDRESS</div>
-          <input id="cfgHost" type="text" placeholder="192.168.1.100" spellcheck="false"
-            style="width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:15px;outline:none">
-        </div>
-        <div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px">TELNET PORT</div>
-          <input id="cfgPort" type="number" placeholder="23" value="23"
-            style="width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:15px;outline:none">
-        </div>
-        <button onclick="saveReceiverConfig()" style="width:100%;padding:12px;background:var(--accent-glow);border:1px solid var(--accent);border-radius:6px;font-family:'VT323',monospace;font-size:16px;letter-spacing:3px;color:var(--accent);cursor:pointer">
-          SAVE &amp; CONNECT
-        </button>
-        <div id="cfgNote" style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;line-height:1.5">
-          Set the IP address of your Pioneer VSX receiver.<br>Default Telnet port is 23.
+    <div class="md-card-elevated">
+      <div class="md-card-header">Receiver</div>
+      <div class="settings-row">
+        <span class="material-icons-round settings-icon">router</span>
+        <div class="settings-text">
+          <div class="settings-title">Connection</div>
+          <div class="settings-subtitle" id="settingsConnStatus">--</div>
         </div>
       </div>
+      <div>
+        <input class="md-text-field" id="cfgHost" type="text" placeholder="192.168.1.100 (IP Address)">
+        <input class="md-text-field" id="cfgPort" type="number" placeholder="23 (Telnet Port)" value="23" style="margin-top:8px">
+      </div>
+      <button class="md-btn-filled" style="width:100%;margin-top:16px" onclick="saveReceiverConfig()">
+        <span class="material-icons-round">save</span> Save &amp; Connect
+      </button>
     </div>
-    <div class="card">
-      <div class="card-label">THEME</div>
+
+    <div class="md-card">
+      <div class="md-card-header">Theme</div>
       <div class="theme-grid" id="themeGrid"></div>
     </div>
   </div>
 
 </div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchTab('main',this)">
+    <div class="nav-indicator"><span class="material-icons-round">tune</span></div>
+    <span class="nav-label">Main</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('zone2',this)">
+    <div class="nav-indicator"><span class="material-icons-round">speaker_group</span></div>
+    <span class="nav-label">Zone 2</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('tone',this)">
+    <div class="nav-indicator"><span class="material-icons-round">graphic_eq</span></div>
+    <span class="nav-label">Tone</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('mode',this)">
+    <div class="nav-indicator"><span class="material-icons-round">surround_sound</span></div>
+    <span class="nav-label">Mode</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('nav',this)">
+    <div class="nav-indicator"><span class="material-icons-round">gamepad</span></div>
+    <span class="nav-label">Nav</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('settings',this)">
+    <div class="nav-indicator"><span class="material-icons-round">settings</span></div>
+    <span class="nav-label">Settings</span>
+  </button>
+</nav>
+
 <script>
 // ── Data ─────────────────────────────────────────────────────────────────────
 const INPUTS = {
@@ -509,101 +829,100 @@ const INPUTS = {
   '38':'INET RADIO','41':'PANDORA','44':'MEDIA SRV',
 };
 const MODES = {
-  '0001':'STEREO','0009':'PURE DIRECT','0100':'DIRECT','0101':'AUTO SURROUND',
-  '0010':'STANDARD','0151':'DOLBY DIGITAL','0200':'DTS / DTS-HD',
-  '0003':'FRONT STAGE SRR','0111':'PL IIx MOVIE','0112':'PL IIx MUSIC',
-  '0113':'PL IIx GAME','0107':'NEO:6 CINEMA','0108':'NEO:6 MUSIC',
+  '0001':'Stereo','0009':'Pure Direct','0100':'Direct','0101':'Auto Surround',
+  '0010':'Standard','0151':'Dolby Digital','0200':'DTS / DTS-HD',
+  '0003':'Front Stage Surround','0111':'PL IIx Movie','0112':'PL IIx Music',
+  '0113':'PL IIx Game','0107':'Neo:6 Cinema','0108':'Neo:6 Music',
 };
 
 // ── Themes ────────────────────────────────────────────────────────────────────
 const THEMES = {
-  punk: {
-    name:'PUNK', desc:'Retro red/purple punk',
-    bg:'#0a000f', panel:'#0f0018', panel2:'#160020', border:'#3a1245',
-    accent:'#ff2d6b', accentDim:'#7a0f35', accentGlow:'rgba(255,45,107,0.15)',
-    green:'#bf5fff', red:'#ff2d6b', blue:'#c03aff',
-    text:'#d8b0e8', textDim:'#5a3a6a', seg:'#08000e',
-    themeColor:'#ff2d6b',
-  },
-  amber: {
-    name:'CLASSIC', desc:'Original amber hi-fi',
-    bg:'#0d0d0d', panel:'#111114', panel2:'#161619', border:'#2a2a30',
-    accent:'#e8a020', accentDim:'#7a5010', accentGlow:'rgba(232,160,32,0.15)',
-    green:'#3ecf60', red:'#e03030', blue:'#3090e8',
-    text:'#c8c0b0', textDim:'#555548', seg:'#1a1a10',
-    themeColor:'#e8a020',
-  },
-  matrix: {
-    name:'MATRIX', desc:'Green phosphor terminal',
-    bg:'#000a00', panel:'#000f00', panel2:'#001400', border:'#0a3a0a',
-    accent:'#00ff41', accentDim:'#004d14', accentGlow:'rgba(0,255,65,0.12)',
-    green:'#00ff41', red:'#ff4444', blue:'#00cc33',
-    text:'#88cc88', textDim:'#2a5a2a', seg:'#000800',
-    themeColor:'#00ff41',
+  material: {
+    name:'Material', desc:'Google Material You',
+    bg:'#1C1B1F', surface:'#211F26', surfaceHigh:'#2B2930',
+    primary:'#D0BCFF', primaryContainer:'#4F378B', onPrimary:'#381E72',
+    secondary:'#CCC2DC', secondaryContainer:'#4A4458',
+    outline:'#938F99', outlineVariant:'#49454F',
+    dot1:'#D0BCFF', dot2:'#CCC2DC', dot3:'#EFB8C8',
   },
   ocean: {
-    name:'OCEAN', desc:'Deep sea blue/teal',
-    bg:'#00080f', panel:'#000d18', panel2:'#001020', border:'#0a2a3a',
-    accent:'#00d4ff', accentDim:'#004a6a', accentGlow:'rgba(0,212,255,0.12)',
-    green:'#00ffcc', red:'#ff4466', blue:'#0088ff',
-    text:'#a0d4e8', textDim:'#2a4a5a', seg:'#000610',
-    themeColor:'#00d4ff',
+    name:'Ocean', desc:'Deep teal & cyan',
+    bg:'#00151A', surface:'#002025', surfaceHigh:'#003040',
+    primary:'#00D4FF', primaryContainer:'#004A6A', onPrimary:'#001F2A',
+    secondary:'#00FFCC', secondaryContainer:'#004D3A',
+    outline:'#4A8090', outlineVariant:'#1A3A45',
+    dot1:'#00D4FF', dot2:'#00FFCC', dot3:'#80E8FF',
   },
-  blaze: {
-    name:'BLAZE', desc:'Hot orange fire',
-    bg:'#0f0500', panel:'#180800', panel2:'#200a00', border:'#3a1a00',
-    accent:'#ff6a00', accentDim:'#7a2a00', accentGlow:'rgba(255,106,0,0.15)',
-    green:'#ffcc00', red:'#ff2200', blue:'#ff6a00',
-    text:'#e8c090', textDim:'#5a3a18', seg:'#0a0200',
-    themeColor:'#ff6a00',
+  rose: {
+    name:'Rose', desc:'Pink & warm red',
+    bg:'#1A0010', surface:'#250018', surfaceHigh:'#350025',
+    primary:'#FFB3C6', primaryContainer:'#7A0030', onPrimary:'#3D0018',
+    secondary:'#FFB4AB', secondaryContainer:'#93000A',
+    outline:'#9A7080', outlineVariant:'#4A2030',
+    dot1:'#FFB3C6', dot2:'#FFB4AB', dot3:'#FF80A0',
+  },
+  forest: {
+    name:'Forest', desc:'Natural green tones',
+    bg:'#0A1A0A', surface:'#101E10', surfaceHigh:'#1A2E1A',
+    primary:'#6DD58C', primaryContainer:'#1A5C2A', onPrimary:'#003912',
+    secondary:'#B5CCBA', secondaryContainer:'#354B3A',
+    outline:'#6A9070', outlineVariant:'#2A4030',
+    dot1:'#6DD58C', dot2:'#B5CCBA', dot3:'#A0E8B0',
+  },
+  amber: {
+    name:'Amber', desc:'Classic warm gold',
+    bg:'#1A1200', surface:'#221800', surfaceHigh:'#302400',
+    primary:'#F0C040', primaryContainer:'#5A4000', onPrimary:'#3A2800',
+    secondary:'#D4B870', secondaryContainer:'#4A3800',
+    outline:'#907840', outlineVariant:'#403000',
+    dot1:'#F0C040', dot2:'#D4B870', dot3:'#FFA020',
   },
 };
 
 function applyTheme(id) {
-  const t = THEMES[id] || THEMES.punk;
+  const t = THEMES[id] || THEMES.material;
   localStorage.setItem('pioneer-theme', id);
-  const s = document.documentElement.style;
-  s.setProperty('--bg',          t.bg);
-  s.setProperty('--panel',       t.panel);
-  s.setProperty('--panel2',      t.panel2);
-  s.setProperty('--border',      t.border);
-  s.setProperty('--accent',      t.accent);
-  s.setProperty('--accent-dim',  t.accentDim);
-  s.setProperty('--accent-glow', t.accentGlow);
-  s.setProperty('--green',       t.green);
-  s.setProperty('--red',         t.red);
-  s.setProperty('--blue',        t.blue);
-  s.setProperty('--text',        t.text);
-  s.setProperty('--text-dim',    t.textDim);
-  s.setProperty('--seg',         t.seg);
-  document.querySelector('meta[name="theme-color"]').content = t.themeColor;
+  const r = document.documentElement.style;
+  r.setProperty('--md-sys-color-background',              t.bg);
+  r.setProperty('--md-sys-color-surface',                 t.bg);
+  r.setProperty('--md-sys-color-surface-container',       t.surface);
+  r.setProperty('--md-sys-color-surface-container-low',   t.bg);
+  r.setProperty('--md-sys-color-surface-container-high',  t.surfaceHigh);
+  r.setProperty('--md-sys-color-surface-container-highest',t.surfaceHigh);
+  r.setProperty('--md-sys-color-primary',                 t.primary);
+  r.setProperty('--md-sys-color-primary-container',       t.primaryContainer);
+  r.setProperty('--md-sys-color-on-primary',              t.onPrimary);
+  r.setProperty('--md-sys-color-on-primary-container',    t.primary);
+  r.setProperty('--md-sys-color-secondary',               t.secondary);
+  r.setProperty('--md-sys-color-secondary-container',     t.secondaryContainer);
+  r.setProperty('--md-sys-color-on-secondary-container',  t.secondary);
+  r.setProperty('--md-sys-color-outline',                 t.outline);
+  r.setProperty('--md-sys-color-outline-variant',         t.outlineVariant);
+  document.querySelector('meta[name="theme-color"]').content = t.bg;
   drawEQ();
-  document.querySelectorAll('.theme-swatch').forEach(el =>
+  document.querySelectorAll('.theme-card').forEach(el =>
     el.classList.toggle('active', el.dataset.theme === id));
 }
 
 function buildThemeGrid() {
   const grid = document.getElementById('themeGrid');
-  const saved = localStorage.getItem('pioneer-theme') || 'punk';
+  const saved = localStorage.getItem('pioneer-theme') || 'material';
   grid.innerHTML = '';
   Object.entries(THEMES).forEach(([id, t]) => {
     const el = document.createElement('div');
-    el.className = 'theme-swatch' + (id === saved ? ' active' : '');
+    el.className = 'theme-card' + (id === saved ? ' active' : '');
     el.dataset.theme = id;
-    el.style.cssText = `background:${t.bg};border-color:${id===saved?'white':'transparent'}`;
+    el.style.cssText = `background:${t.surface}`;
     el.innerHTML = `
-      <div class="theme-swatch-name" style="color:${t.accent}">${t.name}</div>
-      <div class="theme-swatch-desc" style="color:${t.text}">${t.desc}</div>
+      <div class="theme-check"><span class="material-icons-round">check</span></div>
+      <div class="theme-card-name" style="color:${t.primary}">${t.name}</div>
+      <div class="theme-card-desc" style="color:${t.secondary}">${t.desc}</div>
       <div class="theme-dots">
-        <div class="theme-dot" style="background:${t.accent};box-shadow:0 0 6px ${t.accent}"></div>
-        <div class="theme-dot" style="background:${t.green};box-shadow:0 0 6px ${t.green}"></div>
-        <div class="theme-dot" style="background:${t.text}"></div>
+        <div class="theme-dot" style="background:${t.dot1}"></div>
+        <div class="theme-dot" style="background:${t.dot2}"></div>
+        <div class="theme-dot" style="background:${t.dot3}"></div>
       </div>`;
-    el.onclick = () => {
-      applyTheme(id);
-      document.querySelectorAll('.theme-swatch').forEach(s =>
-        s.style.borderColor = s.dataset.theme === id ? 'white' : 'transparent');
-    };
+    el.onclick = () => applyTheme(id);
     grid.appendChild(el);
   });
 }
@@ -621,29 +940,22 @@ function initWS() {
   if (ws && ws.readyState === WebSocket.OPEN) return;
   setConnStatus('connecting');
   ws = new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host);
-  ws.onopen    = () => {
-    const manualHost = document.getElementById('connIpInput').value.trim();
-    ws.send(JSON.stringify({type:'connect', host: manualHost || undefined}));
-  };
+  ws.onopen    = () => ws.send(JSON.stringify({type:'connect'}));
   ws.onmessage = (e) => {
     const msg = JSON.parse(e.data);
     if      (msg.type==='connected')    { setConnStatus('connected'); }
     else if (msg.type==='disconnected') { setConnStatus('disconnected'); }
-    else if (msg.type==='error')        { setConnStatus('error'); showError(msg.message); }
+    else if (msg.type==='error')        { setConnStatus('error'); }
     else if (msg.type==='data')         { parseLine(msg.line); }
-    else if (msg.type==='config') {
+    else if (msg.type==='config')       {
       if (msg.host) {
-        // Host is set server-side — show as label, hide input
         document.getElementById('connHost').textContent = msg.host + ':' + msg.port;
-        document.getElementById('connHost').style.display = '';
-        document.getElementById('connIpInput').style.display = 'none';
-      } else {
-        // No host configured — show editable input so user can set it
-        document.getElementById('connHost').style.display = 'none';
-        document.getElementById('connIpInput').style.display = '';
+        document.getElementById('settingsConnStatus').textContent = msg.host + ':' + msg.port;
       }
     }
-    else if (msg.type==='status')       { document.getElementById('vfdDisplay').textContent = msg.message; }
+    else if (msg.type==='status') {
+      document.getElementById('connHost').textContent = msg.message;
+    }
   };
   ws.onclose = () => { ws=null; setConnStatus('disconnected'); };
   ws.onerror = () => setConnStatus('error');
@@ -661,92 +973,82 @@ function cmd(c) {
     ws.send(JSON.stringify({type:'command', cmd:c}));
 }
 
-// ── Parse receiver responses ──────────────────────────────────────────────────
+// ── Parse ─────────────────────────────────────────────────────────────────────
 function parseLine(line) {
   if      (line.startsWith('PWR')) { S.power=line[3]==='0'; renderPower(); }
-  else if (line.startsWith('VOL')) { const v=parseInt(line.substring(3)); if(!isNaN(v)){S.volume=v; renderVolume();} }
+  else if (line.startsWith('VOL')) { const v=parseInt(line.substring(3)); if(!isNaN(v)){S.volume=v;renderVolume();} }
   else if (line.startsWith('MUT')) { S.muted=line[3]==='0'; renderMute(); }
   else if (line.startsWith('FN'))  { S.input=line.substring(2); renderInput(); }
   else if (line.startsWith('SR'))  { S.mode=line.substring(2); renderMode(); }
-  else if (line.startsWith('ZV'))  { const v=parseInt(line.substring(2)); if(!isNaN(v)){S.z2volume=v; renderZ2();} }
+  else if (line.startsWith('ZV'))  { const v=parseInt(line.substring(2)); if(!isNaN(v)){S.z2volume=v;renderZ2();} }
   else if (line.startsWith('APR')) { S.z2power=line[3]==='0'; renderZ2(); }
   else if (line.startsWith('Z2F')) { S.z2input=line.substring(3); renderZ2Input(); }
-  else if (line.startsWith('FL'))  {
-    try {
-      const hex=line.substring(2); let txt='';
-      for(let i=0;i<hex.length-1;i+=2) txt+=String.fromCharCode(parseInt(hex.substring(i,i+2),16));
-      document.getElementById('vfdDisplay').textContent=txt.trim()||'-- -- --';
-    } catch(_){}
-  }
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderPower() {
   document.getElementById('powerBtn').classList.toggle('on', S.power);
-  const lbl = document.getElementById('powerLabel');
-  lbl.textContent = S.power ? 'POWER ON' : 'STANDBY';
-  lbl.className = 'power-label' + (S.power?' on':'');
-  const ind = document.getElementById('indPower');
-  ind.className = 'vfd-indicator' + (S.power?' active':'');
-  ind.querySelector('span').textContent = S.power ? 'POWER ON' : 'STANDBY';
+  document.getElementById('powerLabel').textContent = S.power ? 'Power On' : 'Standby';
 }
 function renderVolume() {
   const db=(S.volume-161)*0.5;
   const disp=S.volume===0?'---':(db>=0?'+'+db.toFixed(1):db.toFixed(1));
   document.getElementById('volDb').textContent=disp;
+  document.getElementById('volDb').className='volume-value'+(S.muted?' muted':'');
   document.getElementById('volUnit').textContent=S.volume===0?'':'dB';
   const sl=document.getElementById('volSlider');
   sl.value=S.volume; sl.style.setProperty('--pct',(S.volume/185*100)+'%');
-  if(!S.muted) document.getElementById('vfdDisplay').textContent=S.volume===0?'-- -- --':'VOL  '+disp+' dB';
 }
 function renderMute() {
   const btn=document.getElementById('muteBtn');
-  btn.textContent=S.muted?'🔇  UNMUTE':'MUTE';
-  btn.className='mute-btn'+(S.muted?' muted':'');
-  document.getElementById('volDb').className='vol-db'+(S.muted?' muted':'');
-  document.getElementById('indMute').className='vfd-indicator'+(S.muted?' muted':'');
-  if(S.muted) document.getElementById('vfdDisplay').textContent='MUTED';
+  btn.className='mute-chip'+(S.muted?' muted':'');
+  document.getElementById('muteIcon').textContent=S.muted?'volume_off':'volume_up';
+  document.getElementById('muteLabel').textContent=S.muted?'Unmute':'Mute';
+  document.getElementById('volDb').className='volume-value'+(S.muted?' muted':'');
 }
 function renderInput() {
-  document.querySelectorAll('.input-chip[data-code]').forEach(el=>el.classList.toggle('active',el.dataset.code===S.input));
-  document.getElementById('indInputName').textContent=INPUTS[S.input]||S.input;
-  document.getElementById('indInput').className='vfd-indicator active';
+  document.querySelectorAll('.input-chip-item[data-code]').forEach(el=>
+    el.classList.toggle('active',el.dataset.code===S.input));
+  document.getElementById('heroInput').textContent=INPUTS[S.input]||S.input;
 }
 function renderMode() {
-  document.querySelectorAll('.mode-item').forEach(el=>el.classList.toggle('active',el.dataset.code===S.mode));
+  document.querySelectorAll('.mode-item').forEach(el=>
+    el.classList.toggle('active',el.dataset.code===S.mode));
 }
 function renderZ2() {
-  document.getElementById('z2PowerBtn').textContent=S.z2power?'ON':'OFF';
-  document.getElementById('z2PowerBtn').className='toggle-btn'+(S.z2power?' on':'');
+  const sw=document.getElementById('z2PowerSwitch');
+  sw.className='md-switch'+(S.z2power?' on':'');
   document.getElementById('z2VolDb').textContent=S.z2volume||'---';
   const sl=document.getElementById('z2Slider');
   sl.value=S.z2volume; sl.style.setProperty('--pct',(S.z2volume/81*100)+'%');
 }
 function renderZ2Input() {
-  document.querySelectorAll('.input-chip[data-z2code]').forEach(el=>el.classList.toggle('active',el.dataset.z2code===S.z2input));
+  document.querySelectorAll('.input-chip-item[data-z2code]').forEach(el=>
+    el.classList.toggle('active',el.dataset.z2code===S.z2input));
 }
 
 // ── EQ ────────────────────────────────────────────────────────────────────────
 function drawEQ() {
   const c=document.getElementById('eqCanvas');
-  if(!c) return;
+  if(!c||!c.offsetWidth) return;
   const ctx=c.getContext('2d');
   c.width=c.offsetWidth*window.devicePixelRatio;
   c.height=c.offsetHeight*window.devicePixelRatio;
   ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
   const W=c.offsetWidth, H=c.offsetHeight, mid=H/2;
   ctx.clearRect(0,0,W,H);
-  const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+  const primary=getComputedStyle(document.documentElement).getPropertyValue('--md-sys-color-primary').trim();
+  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(W,mid); ctx.stroke();
-  const bassY=mid-(S.bass/6)*mid*0.8, trebleY=mid-(S.treble/6)*mid*0.8;
+  const bassY=mid-(S.bass/6)*mid*0.75, trebleY=mid-(S.treble/6)*mid*0.75;
   const path=new Path2D();
   path.moveTo(0,bassY);
   path.bezierCurveTo(W*0.25,bassY,W*0.35,mid,W*0.5,mid);
   path.bezierCurveTo(W*0.65,mid,W*0.75,trebleY,W,trebleY);
-  ctx.strokeStyle=accent; ctx.lineWidth=2; ctx.stroke(path);
+  ctx.strokeStyle=primary; ctx.lineWidth=2.5; ctx.stroke(path);
   const fill=new Path2D(path); fill.lineTo(W,mid); fill.lineTo(0,mid); fill.closePath();
-  ctx.fillStyle=accent.replace(')',',0.08)').replace('rgb','rgba'); ctx.fill(fill);
+  ctx.fillStyle=primary.includes('#')?primary+'20':primary.replace(')',',0.12)').replace('rgb','rgba');
+  ctx.fill(fill);
 }
 
 // ── Controls ──────────────────────────────────────────────────────────────────
@@ -767,18 +1069,37 @@ function onToneSlider(which,v) {
   const sign=v>0?'+':'';
   document.getElementById(which+'Val').textContent=sign+v+' dB';
   S[which]=parseInt(v); drawEQ();
+  const pct=((parseInt(v)+6)/12*100)+'%';
+  document.getElementById(which+'Slider').style.setProperty('--pct',pct);
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+function saveReceiverConfig() {
+  const host=document.getElementById('cfgHost').value.trim();
+  const port=parseInt(document.getElementById('cfgPort').value)||23;
+  if(!host) return;
+  fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({host,port})})
+    .then(()=>{ if(ws){ws.close();ws=null;} setTimeout(initWS,300); });
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
 function setConnStatus(s) {
-  document.getElementById('connStatus').className='conn-status '+s;
+  document.getElementById('connStatus').className='connection-indicator '+s;
   const btn=document.getElementById('connBtn');
-  btn.textContent=s==='connected'?'DISCONNECT':'CONNECT';
-  btn.className='conn-btn'+(s==='connected'?' active':'');
+  if(s==='connected') {
+    btn.innerHTML='<span class="material-icons-round">link_off</span>';
+    btn.title='Disconnect';
+  } else {
+    btn.innerHTML='<span class="material-icons-round">settings_ethernet</span>';
+    btn.title='Connect';
+  }
+  if(s==='disconnected') document.getElementById('connHost').textContent='Disconnected';
+  if(s==='connecting')   document.getElementById('connHost').textContent='Connecting...';
+  if(s==='error')        document.getElementById('connHost').textContent='Connection error';
 }
-function showError(msg) { document.getElementById('vfdDisplay').textContent='ERR: '+msg.substring(0,20); }
-function switchTab(name,el) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+
+function switchTab(name, el) {
+  document.querySelectorAll('.nav-item').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
@@ -786,11 +1107,11 @@ function switchTab(name,el) {
 }
 
 // ── Build lists ───────────────────────────────────────────────────────────────
-function buildInputGrid(gridId,codeAttr,sendFn) {
+function buildInputGrid(gridId, codeAttr, sendFn) {
   const grid=document.getElementById(gridId); grid.innerHTML='';
   Object.entries(INPUTS).forEach(([code,name])=>{
     const el=document.createElement('button');
-    el.className='input-chip'; el.textContent=name; el.dataset[codeAttr]=code;
+    el.className='input-chip-item'; el.textContent=name; el.dataset[codeAttr]=code;
     el.onclick=()=>sendFn(code); grid.appendChild(el);
   });
 }
@@ -799,45 +1120,24 @@ function buildModeList() {
   Object.entries(MODES).forEach(([code,name])=>{
     const el=document.createElement('div');
     el.className='mode-item'; el.dataset.code=code;
-    el.innerHTML=`<div class="mode-dot"></div><div class="mode-name">${name}</div><div class="mode-code">${code}</div>`;
+    el.innerHTML=`<span class="material-icons-round mode-icon">surround_sound</span><div class="mode-name">${name}</div><div class="mode-code">${code}</div>`;
     el.onclick=()=>cmd(code+'SR'); list.appendChild(el);
-  });
-}
-
-// ── Receiver config ──────────────────────────────────────────────────────────
-function saveReceiverConfig() {
-  const host = document.getElementById('cfgHost').value.trim();
-  const port = parseInt(document.getElementById('cfgPort').value) || 23;
-  if (!host) { document.getElementById('cfgNote').textContent = '⚠ Please enter an IP address'; return; }
-  document.getElementById('cfgNote').textContent = 'Connecting...';
-  // Save to server
-  fetch('/api/config', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({host, port})
-  }).then(() => {
-    // Reconnect WebSocket with new config
-    if (ws) { ws.close(); ws = null; }
-    setTimeout(initWS, 300);
   });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 buildThemeGrid();
-applyTheme(localStorage.getItem('pioneer-theme') || 'punk');
+applyTheme(localStorage.getItem('pioneer-theme') || 'material');
 buildInputGrid('inputGrid','code',code=>cmd(code+'FN'));
 buildInputGrid('z2InputGrid','z2code',code=>cmd(code+'ZS'));
 buildModeList();
 window.addEventListener('resize', drawEQ);
-
-// Keyboard shortcuts
 document.addEventListener('keydown', e=>{
   if(document.activeElement.tagName==='INPUT') return;
-  const map={'ArrowUp':'VU','ArrowDown':'VD','m':'MZ','p':'PZ','ArrowLeft':'CLE','ArrowRight':'CRI','Enter':'CEN','Escape':'CRT'};
+  const map={'ArrowUp':'VU','ArrowDown':'VD','m':S.muted?'MF':'MO','p':'PZ','ArrowLeft':'CLE','ArrowRight':'CRI','Enter':'CEN','Escape':'CRT'};
   if(map[e.key]){e.preventDefault();cmd(map[e.key]);}
 });
 
-// Connect — server owns the IP
 initWS();
 </script>
 <script>

@@ -89,140 +89,73 @@ function publishHADiscovery() {
   };
 
   const configs = [
-    // ── Media player (main) ──────────────────────────────────────────────────
-    {
-      topic: 'homeassistant/media_player/pioneer_vsx/config',
-      payload: {
-        name: 'Pioneer VSX',
-        unique_id: 'pioneer_vsx_main',
-        device,
-        availability_topic: MQTT_AVAIL,
-        state_topic:        `${MQTT_PREFIX}/state/power`,
-        command_topic:      MQTT_CMD_TOPIC,
-        volume_state_topic: `${MQTT_PREFIX}/state/volume`,
-        volume_command_topic: MQTT_CMD_TOPIC,
-        mute_state_topic:   `${MQTT_PREFIX}/state/mute`,
-        mute_command_topic: MQTT_CMD_TOPIC,
-        source_state_topic: `${MQTT_PREFIX}/state/input`,
-        source_list: Object.values(INPUT_NAMES),
-        payload_on:  'ON',
-        payload_off: 'OFF',
-        // volume is 0-185 raw, HA expects 0-1
-        volume_template:    '{{ (value | int / 185) | round(2) }}',
-        set_volume_template:'{{ (value * 185) | int | string | truncate(0, False, "") | int }}VL',
-        payload_play:       'PO',
-        payload_stop:       'PF',
-        payload_mute:       'MZ',
-        source_select_template: '{{ value }}FN',
-      },
-    },
-    // ── Power switch ─────────────────────────────────────────────────────────
     {
       topic: 'homeassistant/switch/pioneer_vsx_power/config',
       payload: {
-        name: 'Pioneer Power',
-        unique_id: 'pioneer_vsx_power',
-        device,
+        name: 'Pioneer Power', unique_id: 'pioneer_vsx_power', device,
         availability_topic: MQTT_AVAIL,
-        state_topic:   `${MQTT_PREFIX}/state/power`,
-        command_topic: MQTT_CMD_TOPIC,
-        payload_on:    'PO',
-        payload_off:   'PF',
-        state_on:      'ON',
-        state_off:     'OFF',
+        state_topic: `${MQTT_PREFIX}/state/power`, command_topic: MQTT_CMD_TOPIC,
+        payload_on: 'PO', payload_off: 'PF', state_on: 'ON', state_off: 'OFF',
         icon: 'mdi:power',
       },
     },
-    // ── Volume number ────────────────────────────────────────────────────────
     {
       topic: 'homeassistant/number/pioneer_vsx_volume/config',
       payload: {
-        name: 'Pioneer Volume',
-        unique_id: 'pioneer_vsx_volume',
-        device,
+        name: 'Pioneer Volume', unique_id: 'pioneer_vsx_volume', device,
         availability_topic: MQTT_AVAIL,
-        state_topic:   `${MQTT_PREFIX}/state/volume`,
-        command_topic: MQTT_CMD_TOPIC,
+        state_topic: `${MQTT_PREFIX}/state/volume`, command_topic: MQTT_CMD_TOPIC,
         command_template: '{{ value | int | string | truncate(0,False,"") }}VL',
-        min: 0, max: 185, step: 1,
-        icon: 'mdi:volume-high',
+        min: 0, max: 185, step: 1, icon: 'mdi:volume-high',
       },
     },
-    // ── Mute switch ──────────────────────────────────────────────────────────
     {
       topic: 'homeassistant/switch/pioneer_vsx_mute/config',
       payload: {
-        name: 'Pioneer Mute',
-        unique_id: 'pioneer_vsx_mute',
-        device,
+        name: 'Pioneer Mute', unique_id: 'pioneer_vsx_mute', device,
         availability_topic: MQTT_AVAIL,
-        state_topic:   `${MQTT_PREFIX}/state/mute`,
-        command_topic: MQTT_CMD_TOPIC,
-        payload_on:    'MO',
-        payload_off:   'MF',
-        state_on:      'ON',
-        state_off:     'OFF',
+        state_topic: `${MQTT_PREFIX}/state/mute`, command_topic: MQTT_CMD_TOPIC,
+        payload_on: 'MO', payload_off: 'MF', state_on: 'ON', state_off: 'OFF',
         icon: 'mdi:volume-mute',
       },
     },
-    // ── Input select ─────────────────────────────────────────────────────────
     {
       topic: 'homeassistant/select/pioneer_vsx_input/config',
       payload: {
-        name: 'Pioneer Input',
-        unique_id: 'pioneer_vsx_input',
-        device,
+        name: 'Pioneer Input', unique_id: 'pioneer_vsx_input', device,
         availability_topic: MQTT_AVAIL,
-        state_topic:    `${MQTT_PREFIX}/state/input`,
-        command_topic:  MQTT_CMD_TOPIC,
+        state_topic: `${MQTT_PREFIX}/state/input`, command_topic: MQTT_CMD_TOPIC,
         command_template: '{{ value }}FN',
-        options: Object.values(INPUT_NAMES),
-        icon: 'mdi:import',
+        options: Object.values(INPUT_NAMES), icon: 'mdi:import',
       },
     },
-    // ── Volume dB sensor ─────────────────────────────────────────────────────
     {
       topic: 'homeassistant/sensor/pioneer_vsx_volume_db/config',
       payload: {
-        name: 'Pioneer Volume dB',
-        unique_id: 'pioneer_vsx_volume_db',
-        device,
+        name: 'Pioneer Volume dB', unique_id: 'pioneer_vsx_volume_db', device,
         availability_topic: MQTT_AVAIL,
         state_topic: `${MQTT_PREFIX}/state/volume_db`,
-        unit_of_measurement: 'dB',
-        icon: 'mdi:volume-high',
+        unit_of_measurement: 'dB', icon: 'mdi:volume-high',
       },
     },
-    // ── Zone 2 power ─────────────────────────────────────────────────────────
     {
       topic: 'homeassistant/switch/pioneer_vsx_z2power/config',
       payload: {
-        name: 'Pioneer Zone 2 Power',
-        unique_id: 'pioneer_vsx_z2power',
-        device,
+        name: 'Pioneer Zone 2 Power', unique_id: 'pioneer_vsx_z2power', device,
         availability_topic: MQTT_AVAIL,
-        state_topic:   `${MQTT_PREFIX}/state/zone2_power`,
-        command_topic: MQTT_CMD_TOPIC,
-        payload_on:    'APO',
-        payload_off:   'APF',
-        state_on:      'ON',
-        state_off:     'OFF',
+        state_topic: `${MQTT_PREFIX}/state/zone2_power`, command_topic: MQTT_CMD_TOPIC,
+        payload_on: 'APO', payload_off: 'APF', state_on: 'ON', state_off: 'OFF',
         icon: 'mdi:speaker',
       },
     },
-    // ── Zone 2 volume ────────────────────────────────────────────────────────
     {
       topic: 'homeassistant/number/pioneer_vsx_z2volume/config',
       payload: {
-        name: 'Pioneer Zone 2 Volume',
-        unique_id: 'pioneer_vsx_z2volume',
-        device,
+        name: 'Pioneer Zone 2 Volume', unique_id: 'pioneer_vsx_z2volume', device,
         availability_topic: MQTT_AVAIL,
-        state_topic:      `${MQTT_PREFIX}/state/zone2_volume`,
-        command_topic:    MQTT_CMD_TOPIC,
+        state_topic: `${MQTT_PREFIX}/state/zone2_volume`, command_topic: MQTT_CMD_TOPIC,
         command_template: '{{ value | int | string }}ZV',
-        min: 0, max: 81, step: 1,
-        icon: 'mdi:volume-medium',
+        min: 0, max: 81, step: 1, icon: 'mdi:volume-medium',
       },
     },
   ];
@@ -230,7 +163,6 @@ function publishHADiscovery() {
   configs.forEach(({ topic, payload }) => {
     mqttClient.publish(topic, JSON.stringify(payload), { retain: true });
   });
-
   console.log('[MQTT] HA discovery published');
 }
 
@@ -239,13 +171,11 @@ function connectMQTT() {
     console.log('[MQTT] No MQTT_HOST set — skipping');
     return;
   }
-
   console.log(`[MQTT] Connecting to ${mqttConfig.host}:${mqttConfig.port}`);
-
   mqttClient = mqtt.connect(`mqtt://${mqttConfig.host}:${mqttConfig.port}`, {
-    username:     mqttConfig.username || undefined,
-    password:     mqttConfig.password || undefined,
-    clientId:     'pioneer-remote',
+    username: mqttConfig.username || undefined,
+    password: mqttConfig.password || undefined,
+    clientId: 'pioneer-remote',
     will: { topic: MQTT_AVAIL, payload: 'offline', retain: true },
     reconnectPeriod: 5000,
   });
@@ -261,7 +191,6 @@ function connectMQTT() {
   mqttClient.on('message', (topic, payload) => {
     const cmd = payload.toString().trim();
     console.log(`[MQTT] Command: ${cmd}`);
-    // Handle input names — convert "HDMI 1" → "19FN"
     if (cmd.endsWith('FN')) {
       const inputName = cmd.slice(0, -2);
       const code = INPUT_CODES[inputName];
@@ -276,7 +205,7 @@ function connectMQTT() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// TCP — single persistent connection to receiver
+// TCP — single persistent connection
 // ════════════════════════════════════════════════════════════════════════════
 const clients = new Set();
 let tcpSocket    = null;
@@ -286,9 +215,7 @@ let reconnectTimer = null;
 
 function broadcast(type, payload) {
   const msg = JSON.stringify({ type, ...payload });
-  for (const ws of clients) {
-    if (ws.readyState === ws.OPEN) ws.send(msg);
-  }
+  for (const ws of clients) if (ws.readyState === ws.OPEN) ws.send(msg);
 }
 function sendTo(ws, type, payload) {
   if (ws.readyState === ws.OPEN) ws.send(JSON.stringify({ type, ...payload }));
@@ -339,13 +266,10 @@ async function connectToReceiver() {
     console.log(`[TCP] Connected to ${host}:${port}`);
     broadcast('connected', { host, port });
     mqttPublish(MQTT_AVAIL, 'online');
-
     const queries = ['?V','?F','?RGC','?M','?FL','?L','?P','?VSB','?VHT','?IS','?MC','?SPK','?HO','?PQ','?HA'];
-    queries.forEach((q, i) => {
-      setTimeout(() => {
-        if (tcpSocket && tcpConnected) tcpSocket.write(q + '\r');
-      }, i * 100);
-    });
+    queries.forEach((q, i) => setTimeout(() => {
+      if (tcpSocket && tcpConnected) tcpSocket.write(q + '\r');
+    }, i * 100));
   });
 
   tcpSocket.on('data', (data) => {
@@ -361,10 +285,7 @@ async function connectToReceiver() {
     });
   });
 
-  tcpSocket.on('timeout', () => {
-    if (tcpSocket && tcpConnected) tcpSocket.write('?P\r');
-  });
-
+  tcpSocket.on('timeout', () => { if (tcpSocket && tcpConnected) tcpSocket.write('?P\r'); });
   tcpSocket.on('error', (err) => {
     console.error('[TCP] Error:', err.message);
     tcpConnected = false;
@@ -372,7 +293,6 @@ async function connectToReceiver() {
     mqttPublish(MQTT_AVAIL, 'offline');
     scheduleReconnect();
   });
-
   tcpSocket.on('close', () => {
     tcpConnected = false;
     console.log('[TCP] Disconnected');
@@ -382,14 +302,10 @@ async function connectToReceiver() {
   });
 }
 
-// ── Parse receiver responses and update state + MQTT ─────────────────────────
 function parseReceiverLine(line) {
   let changed = false;
-
-  if (line.startsWith('PWR')) {
-    state.power = line[3] === '0' ? 'ON' : 'OFF';
-    changed = true;
-  } else if (line.startsWith('VOL')) {
+  if (line.startsWith('PWR')) { state.power = line[3] === '0' ? 'ON' : 'OFF'; changed = true; }
+  else if (line.startsWith('VOL')) {
     const v = parseInt(line.substring(3));
     if (!isNaN(v)) {
       state.volume = v;
@@ -397,28 +313,13 @@ function parseReceiverLine(line) {
       state.volumeDb = v === 0 ? '---' : (db >= 0 ? `+${db.toFixed(1)}` : db.toFixed(1));
       changed = true;
     }
-  } else if (line.startsWith('MUT')) {
-    state.muted = line[3] === '0';
-    changed = true;
-  } else if (line.startsWith('FN')) {
-    const code = line.substring(2);
-    state.input = INPUT_NAMES[code] || code;
-    changed = true;
-  } else if (line.startsWith('SR')) {
-    state.listeningMode = line.substring(2);
-    changed = true;
-  } else if (line.startsWith('ZV')) {
-    const v = parseInt(line.substring(2));
-    if (!isNaN(v)) { state.zone2Volume = v; changed = true; }
-  } else if (line.startsWith('APR')) {
-    state.zone2Power = line[3] === '0' ? 'ON' : 'OFF';
-    changed = true;
-  } else if (line.startsWith('Z2F')) {
-    const code = line.substring(3);
-    state.zone2Input = INPUT_NAMES[code] || code;
-    changed = true;
   }
-
+  else if (line.startsWith('MUT')) { state.muted = line[3] === '0'; changed = true; }
+  else if (line.startsWith('FN'))  { const c = line.substring(2); state.input = INPUT_NAMES[c] || c; changed = true; }
+  else if (line.startsWith('SR'))  { state.listeningMode = line.substring(2); changed = true; }
+  else if (line.startsWith('ZV'))  { const v = parseInt(line.substring(2)); if (!isNaN(v)) { state.zone2Volume = v; changed = true; } }
+  else if (line.startsWith('APR')) { state.zone2Power = line[3] === '0' ? 'ON' : 'OFF'; changed = true; }
+  else if (line.startsWith('Z2F')) { const c = line.substring(3); state.zone2Input = INPUT_NAMES[c] || c; changed = true; }
   if (changed) publishState();
 }
 
@@ -437,7 +338,6 @@ function sendCommand(cmd) {
   return false;
 }
 
-// ── Auto-connect ──────────────────────────────────────────────────────────────
 if (receiverConfig.host) {
   console.log('[CONFIG] Receiver pre-configured, auto-connecting...');
   setTimeout(connectToReceiver, 1000);
@@ -486,6 +386,6 @@ wss.on('connection', (ws) => {
 const PORT = process.env.PORT || 8088;
 server.listen(PORT, () => {
   console.log(`Pioneer Web Remote running on http://0.0.0.0:${PORT}`);
-  console.log(`Receiver: ${receiverConfig.host}:${receiverConfig.port}`);
+  console.log(`Receiver: ${receiverConfig.host || 'not configured'}:${receiverConfig.port}`);
   console.log(`MQTT: ${mqttConfig.host || 'not configured'}`);
 });

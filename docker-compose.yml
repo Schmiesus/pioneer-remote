@@ -10,10 +10,10 @@ services:
       # Pioneer receiver
       - RECEIVER_HOST=192.168.1.100
       - RECEIVER_PORT=23
-      # MQTT / Home Assistant
-      - MQTT_HOST=192.168.1.x
+      # MQTT / Home Assistant (optional — leave MQTT_HOST blank to disable)
+      - MQTT_HOST=
       - MQTT_PORT=1883
-      - MQTT_USER=mqtt
-      - MQTT_PASS=yourpassword
+      - MQTT_USER=
+      - MQTT_PASS=
       - PORT=8088
     network_mode: bridge

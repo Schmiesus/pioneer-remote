@@ -1,28 +1,26 @@
 # Pioneer VSX Web Remote
 
-A self-hosted web remote for legacy Pioneer VSX receivers — runs in Docker, connects over Telnet, works on any browser or as a PWA. Built for receivers too old for modern apps.
+A self-hosted web remote for legacy Pioneer VSX receivers — runs in Docker, connects over Telnet, works on any browser or as a PWA. Material Design 3 interface with full Home Assistant integration. Built for receivers too old for modern apps.
 
 ## Features
 
 - Works with Pioneer VSX receivers that support IP/Telnet control (most models 2010+)
-- Installable as a **PWA** — add to home screen on Android/iOS
+- **Material Design 3** interface — installable as a PWA on Android/iOS
+- **Home Assistant integration** via MQTT auto-discovery — no YAML needed
 - **Multiple browser tabs** supported simultaneously (single shared TCP connection)
-- Full controls: Power, Volume, Input Select, Zone 2, Tone/EQ, Listening Modes, Navigation
-- 5 built-in themes: Punk, Classic, Matrix, Ocean, Blaze
+- Full controls: Power, Volume, Input, Zone 2, Tone/EQ, Listening Modes, Navigation
+- 5 built-in themes (Material, Ocean, Rose, Forest, Amber)
 - Auto-reconnects if the receiver drops the connection
 
 ## Quick Start
 
-### 1. Find your receiver's IP
-Check your router's DHCP client list, or on the receiver: `System Setup → Network → IP Address`
+### 1. Find your receiver's IP and Telnet port
+Check your router's DHCP list or the receiver's network menu. Most VSX models use port **23**; some older ones (e.g. VSX-1020) use **8102**.
 
-### 2. Find your Telnet port
-Most VSX models use **23**. Some older models (e.g. VSX-1020) use **8102**. Check your manual or the app that previously worked.
+### 2. Enable Network Standby
+`System Setup → Network → Network Standby → ON`
 
-### 3. Enable Network Standby
-`System Setup → Network → Network Standby → ON` — without this the receiver refuses connections in standby.
-
-### 4. Run with Docker
+### 3. Run with Docker
 
 ```bash
 docker run -d \
@@ -31,52 +29,49 @@ docker run -d \
   -p 8088:8088 \
   -e RECEIVER_HOST=192.168.1.100 \
   -e RECEIVER_PORT=23 \
-  ghcr.io/YOURUSERNAME/pioneer-remote:latest
+  YOURUSERNAME/pioneer-remote:latest
 ```
 
-Open `http://YOUR-SERVER-IP:8088` in any browser.
+Open `http://YOUR-SERVER-IP:8088`.
 
-### Or with docker-compose
+## Home Assistant Integration
 
-```bash
-git clone https://github.com/YOURUSERNAME/pioneer-remote.git
-cd pioneer-remote
+Set these extra environment variables to enable MQTT:
+
+```
+MQTT_HOST=192.168.1.70
+MQTT_PORT=1883
+MQTT_USER=youruser
+MQTT_PASS=yourpass
 ```
 
-Edit `docker-compose.yml` — set `RECEIVER_HOST` and `RECEIVER_PORT`, then:
+Entities appear automatically in Home Assistant via MQTT discovery:
 
-```bash
-docker-compose up -d
-```
-
-### Configure via UI
-
-If you don't set `RECEIVER_HOST`, the app prompts you to enter the IP and port in the **⚙ Settings** tab.
-
-## Unraid
-
-1. Copy project to `/mnt/user/appdata/pioneer-remote/`
-2. `docker build -t pioneer-remote:latest .`
-3. Docker tab → Add Container → set port `8088:8088` and env vars `RECEIVER_HOST` / `RECEIVER_PORT`
+| Entity | Type |
+|--------|------|
+| `switch.pioneer_power` | Power on/off |
+| `number.pioneer_volume` | Volume (0-185) |
+| `switch.pioneer_mute` | Mute on/off |
+| `select.pioneer_input` | Input source |
+| `sensor.pioneer_volume_db` | Volume in dB |
+| `switch.pioneer_zone_2_power` | Zone 2 power |
+| `number.pioneer_zone_2_volume` | Zone 2 volume |
 
 ## Tested Receivers
 
 | Model | Port | Notes |
 |-------|------|-------|
-| VSX-1020 | 8102 | Confirmed working |
+| VSX-1020 | 8102 | Confirmed. Uses MO/MF for mute (not MZ) |
 | VSX-1021 | 23 | Standard Telnet |
 | VSX-1121 | 23 | Standard Telnet |
-| VSX-923  | 23 | Standard Telnet |
-
-If your model works, open an issue or PR to add it to the list!
 
 ## Troubleshooting
 
-**Can't connect?** — Check Network Standby is ON, ping the receiver IP from your server, check router AP isolation settings.
+**Can't connect?** — Check Network Standby is ON, ping the receiver, check router AP isolation.
 
-**Wrong port?** — VSX-1020 and some older models use **8102** instead of 23.
+**Wrong port?** — VSX-1020 and some older models use **8102**.
 
-**Commands not working?** — Not every command is supported on every model. Check your receiver's IP Control spec.
+**Mute not working?** — Older models use MO (on) / MF (off) instead of MZ toggle. This app handles that automatically.
 
 ## License
 
